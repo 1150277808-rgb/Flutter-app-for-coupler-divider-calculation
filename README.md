@@ -1,16 +1,25 @@
-# polarization
+# Flutter App for Coupler/Divider Calculation
 
-A new Flutter project.
+This project is a Flutter-based educational application for microwave coupler and divider analysis. Start the app by running "/lib/main.dart".
 
-## Getting Started
+## Project Title
+Development of Flutter Apps for Coupler/Divider Analysis
 
-This project is a starting point for a Flutter application.
+## Features
+- Resistive Power Divider
+- Wilkinson Power Divider
+- Directional Coupler
+- Branch-Line Coupler
+- Step-by-step explanation
+- Interactive visualisation
+- Schematic display
 
-A few resources to get you started if this is your first Flutter project:
+## Purpose
+This application is developed to help students understand microwave passive components in RF circuit design through interactive simulation.
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+## Platform
+- Flutter
+- Windows / Web / Mobile support (depending on build target)
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## Supervisor
+Prof. Tan Eng Leong & Dr. Heh Ding Yu
