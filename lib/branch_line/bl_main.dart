@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'dart:math';
 import 'bl_globalvar.dart';
 import 'bl_input.dart';
 import 'bl_steps.dart';
@@ -9,32 +8,7 @@ class BranchLineMain extends StatelessWidget {
   const BranchLineMain({super.key});
 
   void _recalculateSParams(double freq) {
-    const double f0 = 3.0;
-    double diff = (freq - f0).abs();
-
-    double s21, s31, s11, s41;
-
-    if (diff < 0.01) {
-      s21 = 0.7071;
-      s31 = 0.7071;
-      s11 = 0.0000;
-      s41 = 0.0000;
-    } else {
-      double factor = 1.0 / (1.0 + 0.5 * diff * diff);
-
-      s21 = 0.7071 * factor;
-      s31 = 0.7071 * factor;
-
-      double transmittedPower = (s21 * s21) + (s31 * s31);
-      double remainingPower = 1.0 - transmittedPower;
-      if (remainingPower < 0) remainingPower = 0;
-
-      double val = sqrt(remainingPower / 2);
-      s11 = double.parse(val.toStringAsFixed(4));
-      s41 = s11;
-    }
-
-    blController.updateResults(s11, s21, s31, s41);
+    blController.recalculate();
   }
 
   @override
