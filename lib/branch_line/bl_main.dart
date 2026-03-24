@@ -3,12 +3,13 @@ import 'bl_globalvar.dart';
 import 'bl_input.dart';
 import 'bl_steps.dart';
 import 'bl_painter.dart';
+import 'bl_plot.dart';
 
 class BranchLineMain extends StatelessWidget {
   const BranchLineMain({super.key});
 
   void _recalculateSParams(double freq) {
-    blController.recalculate();
+    blController.recalc();
   }
 
   @override
@@ -52,7 +53,12 @@ class BranchLineMain extends StatelessWidget {
                           color: Colors.white,
                           child: SingleChildScrollView(
                             padding: const EdgeInsets.only(right: 10, bottom: 40),
-                            child: BranchLineSteps(controller: blController),
+                            child: Column(
+                              children: [
+                                BranchLineSPlot(controller: blController),
+                                BranchLineSteps(controller: blController),
+                              ],
+                            ),
                           ),
                         ),
                       ),

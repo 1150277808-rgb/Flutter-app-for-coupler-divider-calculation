@@ -1,5 +1,5 @@
+import 'dart:math';
 import 'package:flutter/material.dart';
-import 'dart:math' as math;
 import 'bl_globalvar.dart';
 
 class BranchLinePainterFrame extends StatefulWidget {
@@ -69,243 +69,226 @@ class BranchLinePainter extends CustomPainter {
     final double left = (size.width - boxW) / 2;
     final double top = (size.height - boxH) / 2;
 
-    final Offset p1 = Offset(left, top);
-    final Offset p2 = Offset(left + boxW, top);
-    final Offset p3 = Offset(left + boxW, top + boxH);
-    final Offset p4 = Offset(left, top + boxH);
+    final Map<int, Offset> node = {
+      1: Offset(left, top),
+      2: Offset(left + boxW, top),
+      3: Offset(left + boxW, top + boxH),
+      4: Offset(left, top + boxH),
+    };
 
     const double stubLen = 50.0;
-    final Offset port1Pos = p1 - const Offset(stubLen, 0);
-    final Offset port2Pos = p2 + const Offset(stubLen, 0);
-    final Offset port3Pos = p3 + const Offset(stubLen, 0);
-    final Offset port4Pos = p4 - const Offset(stubLen, 0);
+    final Map<int, Offset> portPos = {
+      1: node[1]! - const Offset(stubLen, 0),
+      2: node[2]! + const Offset(stubLen, 0),
+      3: node[3]! + const Offset(stubLen, 0),
+      4: node[4]! - const Offset(stubLen, 0),
+    };
 
-    // Main structure
-    canvas.drawLine(p1, p2, linePaint);
-    canvas.drawLine(p2, p3, linePaint);
-    canvas.drawLine(p3, p4, linePaint);
-    canvas.drawLine(p4, p1, linePaint);
+    // Static structure
+    canvas.drawLine(node[1]!, node[2]!, linePaint);
+    canvas.drawLine(node[2]!, node[3]!, linePaint);
+    canvas.drawLine(node[3]!, node[4]!, linePaint);
+    canvas.drawLine(node[4]!, node[1]!, linePaint);
 
-    canvas.drawLine(port1Pos, p1, linePaint);
-    canvas.drawLine(p2, port2Pos, linePaint);
-    canvas.drawLine(p3, port3Pos, linePaint);
-    canvas.drawLine(p4, port4Pos, linePaint);
+    canvas.drawLine(portPos[1]!, node[1]!, linePaint);
+    canvas.drawLine(node[2]!, portPos[2]!, linePaint);
+    canvas.drawLine(node[3]!, portPos[3]!, linePaint);
+    canvas.drawLine(node[4]!, portPos[4]!, linePaint);
 
     // Labels
-    _drawText(canvas, "Port 1", port1Pos - const Offset(10, 0), TextAlign.right);
-    _drawText(canvas, "Port 2", port2Pos + const Offset(10, 0), TextAlign.left);
-    _drawText(canvas, "Port 3", port3Pos + const Offset(10, 0), TextAlign.left);
-    _drawText(canvas, "Port 4", port4Pos - const Offset(10, 0), TextAlign.right);
+    _drawText(canvas, "Port 1", portPos[1]! - const Offset(10, 0), TextAlign.right);
+    _drawText(canvas, "Port 2", portPos[2]! + const Offset(10, 0), TextAlign.left);
+    _drawText(canvas, "Port 4", portPos[4]! - const Offset(10, 0), TextAlign.right);
+    _drawText(canvas, "Port 3", portPos[3]! + const Offset(10, 0), TextAlign.left);
 
-    _drawSmallText(canvas, "λ/4, Zh=${controller.zh.toStringAsFixed(2)}Ω", (p1 + p2) / 2 + const Offset(0, -20));
-    _drawSmallText(canvas, "λ/4, Zh=${controller.zh.toStringAsFixed(2)}Ω", (p4 + p3) / 2 + const Offset(0, 10));
-    _drawSmallText(canvas, "λ/4, Zv=${controller.zv.toStringAsFixed(2)}Ω", (p1 + p4) / 2 + const Offset(14, 0));
-    _drawSmallText(canvas, "λ/4, Zv=${controller.zv.toStringAsFixed(2)}Ω", (p2 + p3) / 2 + const Offset(-14, 0));
+    _drawSmallText(canvas, "λ/4, Z₀/√2", (node[1]! + node[2]!) / 2 + const Offset(0, -20));
+    _drawSmallText(canvas, "λ/4, Z₀/√2", (node[4]! + node[3]!) / 2 + const Offset(0, 10));
+    _drawSmallText(canvas, "λ/4, Z₀", (node[1]! + node[4]!) / 2 + const Offset(10, 0));
+    _drawSmallText(canvas, "λ/4, Z₀", (node[2]! + node[3]!) / 2 + const Offset(-10, 0));
 
-    final input = controller.inputPort;
+    final int input = controller.inputPort;
+    final int through = _throughPort(input);
+    final int coupled = _coupledPort(input);
+    final int isolated = _isolatedPort(input);
 
-    final Complex sRef = _responseAt(outputPort: input, inputPort: input);
+    final double visualK = 0.10 + controller.frequency * 0.015;
 
-    int throughPort;
-    int coupledPort;
-    int isolatedPort;
-
-    if (input == 1) {
-      throughPort = 2;
-      coupledPort = 3;
-      isolatedPort = 4;
-    } else if (input == 2) {
-      throughPort = 1;
-      coupledPort = 4;
-      isolatedPort = 3;
-    } else if (input == 3) {
-      throughPort = 4;
-      coupledPort = 1;
-      isolatedPort = 2;
-    } else {
-      throughPort = 3;
-      coupledPort = 2;
-      isolatedPort = 1;
-    }
-
-    final Complex sThrough = _responseAt(outputPort: throughPort, inputPort: input);
-    final Complex sCoupled = _responseAt(outputPort: coupledPort, inputPort: input);
-    final Complex sIso = _responseAt(outputPort: isolatedPort, inputPort: input);
-
-    // Input wave
-    _drawIncomingWave(
+    // 1) Input excitation stub
+    _drawPathWave(
       canvas,
-      _portPoint(input, port1Pos, port2Pos, port3Pos, port4Pos),
-      _nodePoint(input, p1, p2, p3, p4),
+      _buildPath([portPos[input]!, node[input]!]),
       Colors.red,
       1.0,
+      visualK,
+      0.0,
     );
 
-    // Reflection wave
-    _drawOutgoingWave(
+    // 2) Internal ring waves: draw each edge ONCE only (no duplicate overlay)
+    final double internalAmp =
+        (((controller.s2_mag + controller.s3_mag) / 2).clamp(0.0, 1.0)) * 0.95;
+
+    final int rot = input - 1;
+
+    _drawPathWave(
       canvas,
-      _nodePoint(input, p1, p2, p3, p4),
-      _portPoint(input, port1Pos, port2Pos, port3Pos, port4Pos),
+      _buildPath([node[1]!, node[2]!]),
+      Colors.blue.withOpacity(0.85),
+      internalAmp,
+      visualK,
+      _segmentPhase(0, rot),
+    );
+    _drawPathWave(
+      canvas,
+      _buildPath([node[2]!, node[3]!]),
+      Colors.blue.withOpacity(0.85),
+      internalAmp,
+      visualK,
+      _segmentPhase(1, rot),
+    );
+    _drawPathWave(
+      canvas,
+      _buildPath([node[4]!, node[3]!]),
+      Colors.blue.withOpacity(0.85),
+      internalAmp,
+      visualK,
+      _segmentPhase(2, rot),
+    );
+    _drawPathWave(
+      canvas,
+      _buildPath([node[1]!, node[4]!]),
+      Colors.blue.withOpacity(0.85),
+      internalAmp,
+      visualK,
+      _segmentPhase(3, rot),
+    );
+
+    // 3) Output stubs with actual S-parameter amplitudes
+    _drawPathWave(
+      canvas,
+      _buildPath([node[through]!, portPos[through]!]),
       Colors.blue,
-      sRef.abs(),
-      _phaseOf(sRef),
+      controller.s2_mag,
+      visualK,
+      controller.s2_phase,
     );
 
-    // Internal branch waves (重点：把 2-3 这条也画出来)
-    _drawInternalBranchWaves(
-      canvas: canvas,
-      inputPort: input,
-      p1: p1,
-      p2: p2,
-      p3: p3,
-      p4: p4,
-      throughAmp: sThrough.abs(),
-      coupledAmp: sCoupled.abs(),
-      throughPhase: _phaseOf(sThrough),
-      coupledPhase: _phaseOf(sCoupled),
-    );
-
-    // Output feed waves
-    _drawOutgoingWave(
+    _drawPathWave(
       canvas,
-      _nodePoint(throughPort, p1, p2, p3, p4),
-      _portPoint(throughPort, port1Pos, port2Pos, port3Pos, port4Pos),
-      Colors.blue,
-      sThrough.abs(),
-      _phaseOf(sThrough),
+      _buildPath([node[coupled]!, portPos[coupled]!]),
+      Colors.blue.withOpacity(0.70),
+      controller.s3_mag,
+      visualK,
+      controller.s3_phase,
     );
 
-    _drawOutgoingWave(
+    _drawPathWave(
       canvas,
-      _nodePoint(coupledPort, p1, p2, p3, p4),
-      _portPoint(coupledPort, port1Pos, port2Pos, port3Pos, port4Pos),
-      Colors.blue.withOpacity(0.80),
-      sCoupled.abs(),
-      _phaseOf(sCoupled),
+      _buildPath([node[isolated]!, portPos[isolated]!]),
+      Colors.grey.withOpacity(0.75),
+      controller.s4_mag,
+      visualK,
+      controller.s4_phase,
     );
 
-    _drawOutgoingWave(
-      canvas,
-      _nodePoint(isolatedPort, p1, p2, p3, p4),
-      _portPoint(isolatedPort, port1Pos, port2Pos, port3Pos, port4Pos),
-      Colors.grey,
-      sIso.abs(),
-      _phaseOf(sIso),
-    );
+    // Optional reflection at input stub
+    if (controller.s1_mag > 0.05) {
+      _drawPathWave(
+        canvas,
+        _buildPath([node[input]!, portPos[input]!]),
+        Colors.red.withOpacity(0.55),
+        controller.s1_mag,
+        visualK,
+        controller.s1_phase,
+      );
+    }
 
     // Port dots
-    _drawPortDot(canvas, port1Pos, _getPortColor(1, input, isolatedPort));
-    _drawPortDot(canvas, port2Pos, _getPortColor(2, input, isolatedPort));
-    _drawPortDot(canvas, port3Pos, _getPortColor(3, input, isolatedPort));
-    _drawPortDot(canvas, port4Pos, _getPortColor(4, input, isolatedPort));
+    _drawPortDot(canvas, portPos[1]!, _getPortColor(1, input));
+    _drawPortDot(canvas, portPos[2]!, _getPortColor(2, input));
+    _drawPortDot(canvas, portPos[3]!, _getPortColor(3, input));
+    _drawPortDot(canvas, portPos[4]!, _getPortColor(4, input));
 
-    _drawJunctionDot(canvas, p1);
-    _drawJunctionDot(canvas, p2);
-    _drawJunctionDot(canvas, p3);
-    _drawJunctionDot(canvas, p4);
+    // Junction dots
+    _drawJunctionDot(canvas, node[1]!);
+    _drawJunctionDot(canvas, node[2]!);
+    _drawJunctionDot(canvas, node[3]!);
+    _drawJunctionDot(canvas, node[4]!);
   }
 
-  void _drawInternalBranchWaves({
-    required Canvas canvas,
-    required int inputPort,
-    required Offset p1,
-    required Offset p2,
-    required Offset p3,
-    required Offset p4,
-    required double throughAmp,
-    required double coupledAmp,
-    required double throughPhase,
-    required double coupledPhase,
-  }) {
-    final double aMain = math.max(throughAmp, 0.22);
-    final double aCoupled = math.max(coupledAmp * 0.85, 0.18);
-
-    final Color mainColor = Colors.blue;
-    final Color auxColor = Colors.blue.withOpacity(0.75);
-
-    if (inputPort == 1) {
-      _drawSignalWave(canvas, p1, p2, mainColor, aMain, phaseShift: throughPhase);
-      _drawSignalWave(canvas, p1, p4, auxColor, aCoupled, phaseShift: coupledPhase + 0.4);
-      _drawSignalWave(canvas, p4, p3, auxColor, aCoupled, phaseShift: coupledPhase + 0.8);
-      _drawSignalWave(canvas, p2, p3, auxColor, aCoupled, phaseShift: coupledPhase + 1.2);
-    } else if (inputPort == 2) {
-      _drawSignalWave(canvas, p2, p1, mainColor, aMain, phaseShift: throughPhase);
-      _drawSignalWave(canvas, p2, p3, auxColor, aCoupled, phaseShift: coupledPhase + 0.4);
-      _drawSignalWave(canvas, p3, p4, auxColor, aCoupled, phaseShift: coupledPhase + 0.8);
-      _drawSignalWave(canvas, p1, p4, auxColor, aCoupled, phaseShift: coupledPhase + 1.2);
-    } else if (inputPort == 3) {
-      _drawSignalWave(canvas, p3, p4, mainColor, aMain, phaseShift: throughPhase);
-      _drawSignalWave(canvas, p3, p2, auxColor, aCoupled, phaseShift: coupledPhase + 0.4);
-      _drawSignalWave(canvas, p2, p1, auxColor, aCoupled, phaseShift: coupledPhase + 0.8);
-      _drawSignalWave(canvas, p4, p1, auxColor, aCoupled, phaseShift: coupledPhase + 1.2);
-    } else {
-      _drawSignalWave(canvas, p4, p3, mainColor, aMain, phaseShift: throughPhase);
-      _drawSignalWave(canvas, p4, p1, auxColor, aCoupled, phaseShift: coupledPhase + 0.4);
-      _drawSignalWave(canvas, p1, p2, auxColor, aCoupled, phaseShift: coupledPhase + 0.8);
-      _drawSignalWave(canvas, p3, p2, auxColor, aCoupled, phaseShift: coupledPhase + 1.2);
-    }
-  }
-
-  Complex _responseAt({required int outputPort, required int inputPort}) {
-    final s11 = controller.s11;
-    final s21 = controller.s21;
-    final s31 = controller.s31;
-    final s41 = controller.s41;
-
-    final matrix = [
-      [s11, s21, s31, s41],
-      [s21, s11, s41, s31],
-      [s31, s41, s11, s21],
-      [s41, s31, s21, s11],
-    ];
-
-    return matrix[outputPort - 1][inputPort - 1];
-  }
-
-  Offset _portPoint(int port, Offset p1, Offset p2, Offset p3, Offset p4) {
-    switch (port) {
+  int _throughPort(int input) {
+    switch (input) {
       case 1:
-        return p1;
+        return 2;
       case 2:
-        return p2;
+        return 1;
       case 3:
-        return p3;
+        return 4;
+      case 4:
+        return 3;
       default:
-        return p4;
+        return 2;
     }
   }
 
-  Offset _nodePoint(int port, Offset p1, Offset p2, Offset p3, Offset p4) {
-    switch (port) {
+  int _coupledPort(int input) {
+    switch (input) {
       case 1:
-        return p1;
+        return 3;
       case 2:
-        return p2;
+        return 4;
       case 3:
-        return p3;
+        return 1;
+      case 4:
+        return 2;
       default:
-        return p4;
+        return 3;
     }
   }
 
-  Color _getPortColor(int currentPort, int inputPort, int isolatedPort) {
+  int _isolatedPort(int input) {
+    switch (input) {
+      case 1:
+        return 4;
+      case 2:
+        return 3;
+      case 3:
+        return 2;
+      case 4:
+        return 1;
+      default:
+        return 4;
+    }
+  }
+
+  double _segmentPhase(int segmentIndex, int rotation) {
+    return (segmentIndex - rotation) * pi / 2.0;
+  }
+
+  Path _buildPath(List<Offset> points) {
+    final path = Path()..moveTo(points.first.dx, points.first.dy);
+    for (final p in points.skip(1)) {
+      path.lineTo(p.dx, p.dy);
+    }
+    return path;
+  }
+
+  Color _getPortColor(int currentPort, int inputPort) {
     if (currentPort == inputPort) return Colors.red;
-    if (currentPort == isolatedPort) return Colors.grey;
-    return Colors.blue;
-  }
 
-  double _phaseOf(Complex c) {
-    return math.atan2(c.im, c.re);
+    final isolatedPort = _isolatedPort(inputPort);
+    if (currentPort == isolatedPort) return Colors.grey;
+
+    return Colors.blue;
   }
 
   void _drawPortDot(Canvas canvas, Offset center, Color color) {
     final p = Paint()
-      ..style = PaintingStyle.fill
-      ..color = color;
+      ..color = color
+      ..style = PaintingStyle.fill;
 
     if (color == Colors.red) {
-      canvas.drawCircle(center, 10.0, p..color = color.withOpacity(0.25));
-      p.color = color;
+      canvas.drawCircle(center, 10.0, p..color = color.withOpacity(0.3));
+      p.color = Colors.red;
     }
     canvas.drawCircle(center, 5.0, p);
   }
@@ -317,52 +300,14 @@ class BranchLinePainter extends CustomPainter {
     canvas.drawCircle(center, 4.0, p);
   }
 
-  void _drawIncomingWave(
+  void _drawPathWave(
     Canvas canvas,
-    Offset pStart,
-    Offset pEnd,
+    Path followPath,
     Color color,
     double amplitude,
+    double k,
+    double phaseOffset,
   ) {
-    _drawSignalWave(
-      canvas,
-      pStart,
-      pEnd,
-      color,
-      amplitude,
-      phaseShift: 0.0,
-      drawArrow: true,
-    );
-  }
-
-  void _drawOutgoingWave(
-    Canvas canvas,
-    Offset pStart,
-    Offset pEnd,
-    Color color,
-    double amplitude,
-    double phaseShift,
-  ) {
-    _drawSignalWave(
-      canvas,
-      pStart,
-      pEnd,
-      color,
-      amplitude,
-      phaseShift: phaseShift,
-      drawArrow: true,
-    );
-  }
-
-  void _drawSignalWave(
-    Canvas canvas,
-    Offset pStart,
-    Offset pEnd,
-    Color color,
-    double amplitude, {
-    double phaseShift = 0.0,
-    bool drawArrow = false,
-  }) {
     if (amplitude <= 0.03) return;
 
     final paint = Paint()
@@ -370,62 +315,36 @@ class BranchLinePainter extends CustomPainter {
       ..style = PaintingStyle.stroke
       ..strokeWidth = 2.0;
 
-    final path = Path();
-    final dist = (pEnd - pStart).distance;
-    final angle = (pEnd - pStart).direction;
-    final cosA = math.cos(angle);
-    final sinA = math.sin(angle);
+    final metrics = followPath.computeMetrics();
 
-    final spatialK = controller.frequency * 0.15;
+    for (final metric in metrics) {
+      final wavePath = Path();
+      final length = metric.length;
 
-    for (double t = 0; t <= dist; t += 2) {
-      final phase = t * spatialK - animationValue * 2 * math.pi + phaseShift;
-      final currentY = 5.0 * amplitude * math.sin(phase);
+      for (double d = 0; d <= length; d += 2.0) {
+        final tangent = metric.getTangentForOffset(d);
+        if (tangent == null) continue;
 
-      final finalX = pStart.dx + t * cosA - currentY * sinA;
-      final finalY = pStart.dy + t * sinA + currentY * cosA;
+        final vec = tangent.vector;
+        final norm = vec.distance == 0 ? 1.0 : vec.distance;
+        final nx = -vec.dy / norm;
+        final ny = vec.dx / norm;
 
-      if (t == 0) {
-        path.moveTo(finalX, finalY);
-      } else {
-        path.lineTo(finalX, finalY);
+        final phase = d * k - animationValue * 2 * pi - phaseOffset;
+        final offsetVal = 5.0 * amplitude * sin(phase);
+
+        final x = tangent.position.dx + nx * offsetVal;
+        final y = tangent.position.dy + ny * offsetVal;
+
+        if (d == 0) {
+          wavePath.moveTo(x, y);
+        } else {
+          wavePath.lineTo(x, y);
+        }
       }
+
+      canvas.drawPath(wavePath, paint);
     }
-
-    canvas.drawPath(path, paint);
-
-    if (drawArrow) {
-      _drawArrow(canvas, pStart, pEnd, color);
-    }
-  }
-
-  void _drawArrow(Canvas canvas, Offset start, Offset end, Color color) {
-    final angle = math.atan2(end.dy - start.dy, end.dx - start.dx);
-    final arrowX = start.dx + (end.dx - start.dx) * 0.72;
-    final arrowY = start.dy + (end.dy - start.dy) * 0.72;
-
-    final arrowPaint = Paint()
-      ..color = color
-      ..style = PaintingStyle.fill;
-
-    const arrowSize = 6.0;
-
-    final path = Path();
-    path.moveTo(
-      arrowX + arrowSize * math.cos(angle),
-      arrowY + arrowSize * math.sin(angle),
-    );
-    path.lineTo(
-      arrowX + arrowSize * math.cos(angle + 2.5),
-      arrowY + arrowSize * math.sin(angle + 2.5),
-    );
-    path.lineTo(
-      arrowX + arrowSize * math.cos(angle - 2.5),
-      arrowY + arrowSize * math.sin(angle - 2.5),
-    );
-    path.close();
-
-    canvas.drawPath(path, arrowPaint);
   }
 
   void _drawText(Canvas canvas, String text, Offset pos, TextAlign align) {
@@ -437,13 +356,15 @@ class BranchLinePainter extends CustomPainter {
       ),
       text: text,
     );
+
     final tp = TextPainter(
       text: span,
       textAlign: align,
       textDirection: TextDirection.ltr,
     );
+
     tp.layout();
-    var drawPos = pos - Offset(0, tp.height / 2);
+    Offset drawPos = pos - Offset(0, tp.height / 2);
     if (align == TextAlign.right) {
       drawPos = drawPos - Offset(tp.width, 0);
     }
@@ -459,25 +380,28 @@ class BranchLinePainter extends CustomPainter {
       ),
       text: text,
     );
+
     final tp = TextPainter(
       text: span,
       textAlign: TextAlign.center,
       textDirection: TextDirection.ltr,
     );
+
     tp.layout();
 
     final bgPaint = Paint()
-      ..color = Colors.white.withOpacity(0.88)
+      ..color = Colors.white.withOpacity(0.8)
       ..style = PaintingStyle.fill;
 
     canvas.drawRect(
       Rect.fromCenter(
         center: pos,
-        width: tp.width + 6,
+        width: tp.width + 4,
         height: tp.height + 2,
       ),
       bgPaint,
     );
+
     tp.paint(canvas, pos - Offset(tp.width / 2, tp.height / 2));
   }
 

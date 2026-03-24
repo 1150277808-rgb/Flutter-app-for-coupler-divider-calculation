@@ -1,4 +1,4 @@
-import 'dart:math' as math;
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_math_fork/flutter_math.dart';
 import 'bl_globalvar.dart';
@@ -12,230 +12,254 @@ class BranchLineSteps extends StatelessWidget {
   Widget build(BuildContext context) {
     return AnimatedBuilder(
       animation: controller,
-      builder: (context, _) {
-        final sol = controller.solution;
+      builder: (context, child) {
+        final bool offCenter =
+            (controller.freqGHz - controller.centerFreq).abs() > 0.05;
 
-        final offCenter =
-            (controller.freqGHz - controller.centerFreq).abs() > 0.01;
+        final double s11dB = _db20(controller.s1_mag);
+        final double s21dB = _db20(controller.s2_mag);
+        final double s31dB = _db20(controller.s3_mag);
+        final double s41dB = _db20(controller.s4_mag);
 
-        final idealZh = controller.z0 / math.sqrt(2.0);
-        final idealZv = controller.z0;
+        final double thetaDeg = _radToDeg(controller.theta);
 
-        final offIdealImpedance =
-            (controller.zh - idealZh).abs() > 0.05 ||
-            (controller.zv - idealZv).abs() > 0.05;
-
-        final input = controller.inputPort;
-        final bVec = _outgoingVector(input, controller);
-
-        return ListView(
-          padding: const EdgeInsets.only(bottom: 50),
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
+        return Column(
           children: [
             _buildHeader(),
 
             _buildMathCard(
-              title: "Step 1: Design Point (Ideal Branch-Line Hybrid)",
+              title: "Step 1: Even Mode (Theory @ f = f₀)",
               content: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const Text(
-                    "At the design frequency f0, all four branches are quarter-wave long.",
+                    "Assumption: frequency is exactly at the center frequency, so each branch has electrical length λ/4 (90°).",
+                    style: TextStyle(
+                      fontStyle: FontStyle.italic,
+                      color: Colors.grey,
+                    ),
                   ),
                   const SizedBox(height: 8),
-                  _buildLeftMath(r'\theta_0 = 90^\circ'),
-                  const SizedBox(height: 6),
-                  _buildLeftMath(r'Z_h = \frac{Z_0}{\sqrt{2}}, \quad Z_v = Z_0'),
-                  const SizedBox(height: 10),
-                  Text(
-                    "Current values: Z0=${controller.z0.toStringAsFixed(4)} Ω, "
-                    "Zh=${controller.zh.toStringAsFixed(4)} Ω, "
-                    "Zv=${controller.zv.toStringAsFixed(4)} Ω",
+                  const Text(
+                    "Equivalent circuit: λ/4 line (Y₀/k) with open stubs (jY₀).",
+                    style: TextStyle(fontWeight: FontWeight.w500),
                   ),
-                  const SizedBox(height: 6),
-                  Text(
-                    "Ideal values for this Z0 would be: "
-                    "Zh=${idealZh.toStringAsFixed(4)} Ω, Zv=${idealZv.toStringAsFixed(4)} Ω",
-                    style: const TextStyle(fontSize: 12, color: Colors.grey),
+                  const SizedBox(height: 8),
+                  const Text("The even-mode ABCD matrix is:"),
+                  _buildLeftMath(
+                    r'\begin{bmatrix} C_{11} & C_{12} \\ C_{21} & C_{22} \end{bmatrix}_e='
+                    r'\begin{bmatrix} 1 & 0 \\ jY_0 & 1 \end{bmatrix}'
+                    r'\begin{bmatrix} 0 & jZ_0/k \\ jkY_0 & 0 \end{bmatrix}'
+                    r'\begin{bmatrix} 1 & 0 \\ jY_0 & 1 \end{bmatrix}'
+                    r'=\frac{1}{k}\begin{bmatrix} -1 & jZ_0 \\ jY_0(k^2-1) & -1 \end{bmatrix}',
                   ),
-                  if (offIdealImpedance)
-                    Padding(
-                      padding: const EdgeInsets.only(top: 8.0),
-                      child: Text(
-                        "Note: current line impedances are not at the ideal branch-line design values.",
-                        style: TextStyle(
-                          color: Colors.orange[800],
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
+                  const SizedBox(height: 8),
+                  _buildLeftMath(
+                    r'\Gamma_e='
+                    r'\frac{Z_0 C_{11}+C_{12}-Z_0^2 C_{21}-Z_0 C_{22}}{Z_0 C_{11}+C_{12}+Z_0^2 C_{21}+Z_0 C_{22}}',
+                  ),
+                  const SizedBox(height: 8),
+                  _buildLeftMath(
+                    r'\Gamma_e=0 \Rightarrow -jkZ_0+j\frac{2Z_0}{k}=0 \Rightarrow k=\sqrt{2}',
+                  ),
+                  const SizedBox(height: 8),
+                  _buildLeftMath(
+                    r'\tau_e=\frac{1}{\sqrt{2}}(-1-j)',
+                  ),
                 ],
               ),
             ),
 
             _buildMathCard(
-              title: "Step 2: Current Electrical Length and Modal Stub Admittances",
+              title: "Step 2: Odd Mode (Theory @ f = f₀)",
               content: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _buildLeftMath(
-                    '\\theta = \\frac{\\pi}{2}\\frac{f}{f_0} = '
-                    '\\frac{\\pi}{2}\\frac{${_f(controller.freqGHz)}}{${_f(controller.centerFreq)}}'
-                    ' = ${_f(sol.thetaDeg)}^\\circ',
-                  ),
-                  const SizedBox(height: 6),
-                  _buildLeftMath(
-                    '\\theta/2 = ${_f(sol.thetaHalfDeg)}^\\circ',
-                  ),
-                  const SizedBox(height: 10),
                   const Text(
-                    "Even mode uses open-circuited stubs; odd mode uses short-circuited stubs.",
-                    style: TextStyle(fontWeight: FontWeight.bold),
+                    "Assumption: line length remains λ/4, while the stubs become shorted in odd-mode analysis.",
+                    style: TextStyle(
+                      fontStyle: FontStyle.italic,
+                      color: Colors.grey,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  const Text("The odd-mode ABCD matrix is:"),
+                  _buildLeftMath(
+                    r'\begin{bmatrix} C_{11} & C_{12} \\ C_{21} & C_{22} \end{bmatrix}_o='
+                    r'\begin{bmatrix} 1 & 0 \\ -jY_0 & 1 \end{bmatrix}'
+                    r'\begin{bmatrix} 0 & jZ_0/k \\ jkY_0 & 0 \end{bmatrix}'
+                    r'\begin{bmatrix} 1 & 0 \\ -jY_0 & 1 \end{bmatrix}'
+                    r'=\frac{1}{k}\begin{bmatrix} 1 & jZ_0 \\ jY_0(k^2-1) & 1 \end{bmatrix}',
                   ),
                   const SizedBox(height: 8),
                   _buildLeftMath(
-                    'Y_{e,stub} = j\\frac{1}{Z_v}\\tan(\\theta/2) = ${_cTex(sol.yEvenStub)}',
+                    r'\Gamma_o='
+                    r'\frac{Z_0 C_{11}+C_{12}-Z_0^2 C_{21}-Z_0 C_{22}}{Z_0 C_{11}+C_{12}+Z_0^2 C_{21}+Z_0 C_{22}}',
                   ),
-                  const SizedBox(height: 6),
+                  const SizedBox(height: 8),
                   _buildLeftMath(
-                    'Y_{o,stub} = -j\\frac{1}{Z_v}\\cot(\\theta/2) = ${_cTex(sol.yOddStub)}',
+                    r'\Gamma_o=0 \Rightarrow -jkZ_0+j\frac{2Z_0}{k}=0 \Rightarrow k=\sqrt{2}',
                   ),
-                  if (offCenter)
-                    Padding(
-                      padding: const EdgeInsets.only(top: 8.0),
-                      child: Text(
-                        "Because f ≠ f0, the branches are no longer exactly 90°.",
+                  const SizedBox(height: 8),
+                  _buildLeftMath(
+                    r'\tau_o=\frac{1}{\sqrt{2}}(1-j)',
+                  ),
+                ],
+              ),
+            ),
+
+            _buildMathCard(
+              title: "Step 3: Ideal S-Matrix and Frequency-Dependent Extension",
+              content: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    "At the center frequency, superposition gives the ideal quadrature-hybrid response:",
+                    style: TextStyle(fontWeight: FontWeight.w600),
+                  ),
+                  const SizedBox(height: 8),
+                  _buildLeftMath(r'S_{11}(f_0)=0'),
+                  _buildLeftMath(r'S_{21}(f_0)=\frac{-j}{\sqrt{2}}'),
+                  _buildLeftMath(r'S_{31}(f_0)=\frac{-1}{\sqrt{2}}'),
+                  _buildLeftMath(r'S_{41}(f_0)=0'),
+                  const SizedBox(height: 8),
+                  Center(
+                    child: Math.tex(
+                      r'[S](f_0)=\frac{-1}{\sqrt{2}}'
+                      r'\begin{bmatrix}'
+                      r'0 & j & 1 & 0 \\'
+                      r'j & 0 & 0 & 1 \\'
+                      r'1 & 0 & 0 & j \\'
+                      r'0 & 1 & j & 0'
+                      r'\end{bmatrix}',
+                      textStyle: const TextStyle(fontSize: 18),
+                    ),
+                  ),
+                  const Divider(height: 24),
+                  const Text(
+                    "For the app simulation away from f₀, the response is made frequency-dependent through the electrical length:",
+                    style: TextStyle(fontWeight: FontWeight.w600),
+                  ),
+                  const SizedBox(height: 8),
+                  _buildLeftMath(r'\theta(f)=\frac{\pi}{2}\frac{f}{f_0}'),
+                  _buildFormulaWithValue(
+                    r'\theta',
+                    '${controller.theta.toStringAsFixed(4)} rad (${thetaDeg.toStringAsFixed(2)}°)',
+                    Colors.indigo,
+                  ),
+                  const SizedBox(height: 8),
+                  _buildLeftMath(
+                    r'P_{\mathrm{tx}}(f)=\cos^2\!\left(\theta-\frac{\pi}{2}\right)',
+                  ),
+                  _buildLeftMath(
+                    r'P_{\mathrm{rem}}(f)=1-P_{\mathrm{tx}}(f)',
+                  ),
+                  _buildLeftMath(
+                    r'|S_{21}(f)|=|S_{31}(f)|=\sqrt{\frac{P_{\mathrm{tx}}(f)}{2}}',
+                  ),
+                  _buildLeftMath(
+                    r'|S_{11}(f)|=|S_{41}(f)|=\sqrt{\frac{P_{\mathrm{rem}}(f)}{2}}',
+                  ),
+                  const SizedBox(height: 8),
+                  _buildLeftMath(r'\angle S_{21}(f)=-\theta(f)'),
+                  _buildLeftMath(r'\angle S_{31}(f)=-\theta(f)-\frac{\pi}{2}'),
+                  _buildLeftMath(r'\angle S_{11}(f)=\pi-2\theta(f)'),
+                  _buildLeftMath(r'\angle S_{41}(f)=-2\theta(f)'),
+                  if (offCenter) ...[
+                    const SizedBox(height: 10),
+                    Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        color: Colors.orange.withOpacity(0.10),
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                      child: const Text(
+                        "Current frequency is away from the center frequency, so the branch lines are no longer exactly λ/4. Therefore the ideal cancellation in the design-point S-matrix does not hold exactly.",
                         style: TextStyle(
-                          color: Colors.red[700],
+                          color: Colors.deepOrange,
                           fontStyle: FontStyle.italic,
                         ),
                       ),
                     ),
+                  ],
                 ],
               ),
             ),
 
             _buildMathCard(
-              title: "Step 3: Even/Odd ABCD and Modal 2-Port S-Parameters",
+              title: "Step 4: Actual Simulation (Current f)",
               content: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
-                    "The reduced even/odd 2-port networks are built numerically from:",
-                  ),
-                  const SizedBox(height: 8),
-                  _buildLeftMath(
-                    r'[C]_e=[1\ 0;Y_{e,stub}\ 1]\,[\text{line}(Z_h,\theta)]\,[1\ 0;Y_{e,stub}\ 1]',
-                  ),
-                  const SizedBox(height: 6),
-                  _buildLeftMath(
-                    r'[C]_o=[1\ 0;Y_{o,stub}\ 1]\,[\text{line}(Z_h,\theta)]\,[1\ 0;Y_{o,stub}\ 1]',
-                  ),
-                  const SizedBox(height: 12),
-                  const Text(
-                    "Numerical even-mode ABCD:",
-                    style: TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 4),
-                  _buildLeftMath(_matrix2x2Tex(sol.ae, sol.be, sol.ce, sol.de)),
-                  const SizedBox(height: 10),
-                  const Text(
-                    "Numerical odd-mode ABCD:",
-                    style: TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 4),
-                  _buildLeftMath(_matrix2x2Tex(sol.ao, sol.bo, sol.co, sol.dO)),
-                  const SizedBox(height: 12),
-                  _buildLeftMath(
-                    '\\Gamma_e = ${_cTex(sol.gammaE)}, \\quad \\tau_e = ${_cTex(sol.tauE)}',
-                  ),
-                  const SizedBox(height: 6),
-                  _buildLeftMath(
-                    '\\Gamma_o = ${_cTex(sol.gammaO)}, \\quad \\tau_o = ${_cTex(sol.tauO)}',
-                  ),
-                ],
-              ),
-            ),
-
-            _buildMathCard(
-              title: "Step 4: Recombine to the 4-Port S-Parameters",
-              content: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _buildLeftMath(
-                    'S_{11}=\\frac{\\Gamma_e+\\Gamma_o}{2}=${_cTex(sol.s11)}',
-                  ),
-                  const SizedBox(height: 6),
-                  _buildLeftMath(
-                    'S_{21}=\\frac{\\tau_e+\\tau_o}{2}=${_cTex(sol.s21)}',
-                  ),
-                  const SizedBox(height: 6),
-                  _buildLeftMath(
-                    'S_{31}=\\frac{\\tau_e-\\tau_o}{2}=${_cTex(sol.s31)}',
-                  ),
-                  const SizedBox(height: 6),
-                  _buildLeftMath(
-                    'S_{41}=\\frac{\\Gamma_e-\\Gamma_o}{2}=${_cTex(sol.s41)}',
-                  ),
-                  const SizedBox(height: 12),
-                  const Text(
-                    "Reference 4-port matrix form:",
-                    style: TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 6),
-                  _buildLeftMath(
-                    r'\mathbf{S}=\begin{bmatrix}'
-                    r'S_{11}&S_{21}&S_{31}&S_{41}\\'
-                    r'S_{21}&S_{11}&S_{41}&S_{31}\\'
-                    r'S_{31}&S_{41}&S_{11}&S_{21}\\'
-                    r'S_{41}&S_{31}&S_{21}&S_{11}'
-                    r'\end{bmatrix}',
-                  ),
-                  const SizedBox(height: 12),
                   Container(
                     width: double.infinity,
-                    padding: const EdgeInsets.all(10),
+                    padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
                       color: Colors.indigo[50],
-                      borderRadius: BorderRadius.circular(8),
+                      borderRadius: BorderRadius.circular(4),
                     ),
-                    child: Text(
-                      "Current input port: Port $input",
-                      style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: Colors.indigo,
-                      ),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            "Input: Port ${controller.inputPort} @ ${controller.freqGHz.toStringAsFixed(3)} GHz",
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Colors.indigo,
+                            ),
+                          ),
+                        ),
+                        if (offCenter)
+                          const Tooltip(
+                            message: "Off-center frequency changes the electrical length and S-parameters.",
+                            child: Icon(
+                              Icons.warning_amber_rounded,
+                              color: Colors.orange,
+                              size: 20,
+                            ),
+                          ),
+                      ],
                     ),
                   ),
                   const SizedBox(height: 10),
-                  _buildLeftMath('\\mathbf{{a}}=${_inputVectorTex(input)}'),
-                  const SizedBox(height: 6),
-                  _buildLeftMath('\\mathbf{{b}}=${_vector4Tex(bVec)}'),
-                ],
-              ),
-            ),
-
-            _buildMathCard(
-              title: "Step 5: Magnitudes Seen in the Simulation",
-              content: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _buildResultRow("Reflection |S11|", controller.s1_mag),
-                  _buildResultRow("Through |S21|", controller.s2_mag),
-                  _buildResultRow("Coupled |S31|", controller.s3_mag),
-                  _buildResultRow("Isolation |S41|", controller.s4_mag),
-                  const SizedBox(height: 12),
-                  if (!offCenter && !offIdealImpedance)
-                    const Text(
-                      "At the ideal point, reflection and isolation should approach zero while through/coupled approach 0.707.",
-                      style: TextStyle(fontSize: 12),
-                    )
-                  else
-                    Text(
-                      "Deviation from ideal frequency and/or ideal impedances changes the cancellation condition, so S11 and S41 may increase.",
-                      style: TextStyle(fontSize: 12, color: Colors.red[700]),
-                    ),
+                  Text(
+                    'Electrical length: θ = ${controller.theta.toStringAsFixed(4)} rad (${thetaDeg.toStringAsFixed(2)}°)',
+                  ),
+                  const SizedBox(height: 10),
+                  _buildResultRow(
+                    "Through |S21|",
+                    controller.s2_mag,
+                    s21dB,
+                    Colors.blue,
+                    phaseDeg: _radToDeg(controller.s2_phase),
+                  ),
+                  _buildResultRow(
+                    "Coupled |S31|",
+                    controller.s3_mag,
+                    s31dB,
+                    Colors.blue,
+                    phaseDeg: _radToDeg(controller.s3_phase),
+                  ),
+                  _buildResultRow(
+                    "Isolated |S41|",
+                    controller.s4_mag,
+                    s41dB,
+                    Colors.grey,
+                    phaseDeg: _radToDeg(controller.s4_phase),
+                  ),
+                  _buildResultRow(
+                    "Reflection |S11|",
+                    controller.s1_mag,
+                    s11dB,
+                    Colors.red,
+                    phaseDeg: _radToDeg(controller.s1_phase),
+                  ),
+                  const SizedBox(height: 10),
+                  const Text(
+                    "These displayed values are now frequency-dependent, and the wave animation uses the same magnitudes and phases.",
+                    style: TextStyle(color: Colors.black87),
+                  ),
                 ],
               ),
             ),
@@ -243,25 +267,6 @@ class BranchLineSteps extends StatelessWidget {
         );
       },
     );
-  }
-
-  static List<Complex> _outgoingVector(
-    int inputPort,
-    BranchLineController c,
-  ) {
-    final matrix = [
-      [c.s11, c.s21, c.s31, c.s41],
-      [c.s21, c.s11, c.s41, c.s31],
-      [c.s31, c.s41, c.s11, c.s21],
-      [c.s41, c.s31, c.s21, c.s11],
-    ];
-
-    return [
-      matrix[0][inputPort - 1],
-      matrix[1][inputPort - 1],
-      matrix[2][inputPort - 1],
-      matrix[3][inputPort - 1],
-    ];
   }
 
   Widget _buildLeftMath(String tex) {
@@ -287,7 +292,7 @@ class BranchLineSteps extends StatelessWidget {
       child: const Column(
         children: [
           Text(
-            "Theoretical Derivation vs. Simulation",
+            "Theoretical Derivation vs. Frequency-Dependent Simulation",
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
@@ -297,7 +302,7 @@ class BranchLineSteps extends StatelessWidget {
           ),
           SizedBox(height: 5),
           Text(
-            "This version computes the branch-line coupler from current Z0, Zh, Zv and frequency.",
+            "Steps 1-2 summarize the design-point derivation at the center frequency. Steps 3-4 show the frequency-dependent S-parameter model used by the app and the current calculated response.",
             style: TextStyle(fontSize: 12, color: Colors.black54),
             textAlign: TextAlign.center,
           ),
@@ -306,7 +311,10 @@ class BranchLineSteps extends StatelessWidget {
     );
   }
 
-  Widget _buildMathCard({required String title, required Widget content}) {
+  Widget _buildMathCard({
+    required String title,
+    required Widget content,
+  }) {
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       elevation: 2,
@@ -320,84 +328,102 @@ class BranchLineSteps extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 0, 16, 20),
             child: content,
-          )
+          ),
         ],
       ),
     );
   }
 
-  Widget _buildResultRow(String label, double val) {
-    final db = val <= 1e-6 ? -120.0 : 20 * math.log(val) / math.ln10;
+  Widget _buildFormulaWithValue(String tex, String value, Color valueColor) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: Row(
+        children: [
+          Expanded(
+            child: SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Math.tex(
+                tex,
+                textStyle: const TextStyle(fontSize: 15),
+              ),
+            ),
+          ),
+          const SizedBox(width: 8),
+          const Text("="),
+          const SizedBox(width: 8),
+          Text(
+            value,
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              color: valueColor,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 
+  Widget _buildResultRow(
+    String label,
+    double linearVal,
+    double dbVal,
+    Color color, {
+    double? phaseDeg,
+  }) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 6),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              SizedBox(
-                width: 140,
+              Expanded(
                 child: Text(
                   label,
                   style: const TextStyle(fontWeight: FontWeight.bold),
                 ),
               ),
-              const Text(" = "),
               Text(
-                val.toStringAsFixed(4),
+                linearVal.toStringAsFixed(4),
                 style: const TextStyle(
                   fontFamily: 'monospace',
+                  fontSize: 15,
                   fontWeight: FontWeight.bold,
                 ),
               ),
               const SizedBox(width: 10),
               Text(
-                "${db.toStringAsFixed(1)} dB",
-                style: const TextStyle(fontSize: 12, color: Colors.grey),
+                '${dbVal.toStringAsFixed(2)} dB',
+                style: const TextStyle(fontWeight: FontWeight.bold),
               ),
+              if (phaseDeg != null) ...[
+                const SizedBox(width: 10),
+                Text(
+                  '${phaseDeg.toStringAsFixed(1)}°',
+                  style: const TextStyle(
+                    fontSize: 12,
+                    color: Colors.black54,
+                  ),
+                ),
+              ],
             ],
           ),
-          const SizedBox(height: 4),
+          const SizedBox(height: 6),
           LinearProgressIndicator(
-            value: val.clamp(0.0, 1.0),
-            minHeight: 6,
-            backgroundColor: Colors.grey[200],
-            color: Colors.blue,
+            value: linearVal.clamp(0.0, 1.0),
+            minHeight: 5,
+            backgroundColor: Colors.grey.shade200,
+            color: color,
           ),
         ],
       ),
     );
   }
 
-  static String _f(double v) => v.toStringAsFixed(4);
-
-  static String _cTex(Complex c) {
-    final r = c.re.toStringAsFixed(4);
-    final i = c.im.abs().toStringAsFixed(4);
-    final sign = c.im >= 0 ? '+' : '-';
-    return '$r$sign j$i';
+  double _db20(double x) {
+    if (x <= 1e-6) return -120.0;
+    return 20.0 * log(x) / ln10;
   }
 
-  static String _matrix2x2Tex(Complex a, Complex b, Complex c, Complex d) {
-    return '\\begin{bmatrix}'
-        '${_cTex(a)} & ${_cTex(b)} \\\\ '
-        '${_cTex(c)} & ${_cTex(d)}'
-        '\\end{bmatrix}';
-  }
-
-  static String _inputVectorTex(int port) {
-    if (port == 1) return '\\begin{bmatrix}1\\\\0\\\\0\\\\0\\end{bmatrix}';
-    if (port == 2) return '\\begin{bmatrix}0\\\\1\\\\0\\\\0\\end{bmatrix}';
-    if (port == 3) return '\\begin{bmatrix}0\\\\0\\\\1\\\\0\\end{bmatrix}';
-    return '\\begin{bmatrix}0\\\\0\\\\0\\\\1\\end{bmatrix}';
-  }
-
-  static String _vector4Tex(List<Complex> v) {
-    return '\\begin{bmatrix}'
-        '${_cTex(v[0])}\\\\'
-        '${_cTex(v[1])}\\\\'
-        '${_cTex(v[2])}\\\\'
-        '${_cTex(v[3])}'
-        '\\end{bmatrix}';
-  }
+  double _radToDeg(double rad) => rad * 180.0 / pi;
 }

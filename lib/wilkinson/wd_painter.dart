@@ -7,8 +7,10 @@ class WilkinsonPainter extends CustomPainter {
   final WilkinsonController controller;
   final double animationValue;
 
-  WilkinsonPainter({required this.controller, required this.animationValue})
-      : super(repaint: controller);
+  WilkinsonPainter({
+    required this.controller,
+    required this.animationValue,
+  }) : super(repaint: controller);
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -34,27 +36,29 @@ class WilkinsonPainter extends CustomPainter {
       ..moveTo(pStart.dx, pStart.dy)
       ..lineTo(pSplit.dx, pSplit.dy);
 
-    Path pathTop = Path();
-    pathTop.moveTo(pSplit.dx, pSplit.dy);
-    pathTop.quadraticBezierTo(
-      center.dx,
-      -110 + center.dy / 2 + 50,
-      pPort2.dx,
-      pPort2.dy,
-    );
+    Path pathTop = Path()
+      ..moveTo(pSplit.dx, pSplit.dy)
+      ..quadraticBezierTo(
+        center.dx,
+        -110 + center.dy / 2 + 50,
+        pPort2.dx,
+        pPort2.dy,
+      );
 
-    Path pathBot = Path();
-    pathBot.moveTo(pSplit.dx, pSplit.dy);
-    pathBot.quadraticBezierTo(
-      center.dx,
-      110 + center.dy / 2 - 50,
-      pPort3.dx,
-      pPort3.dy,
-    );
+    Path pathBot = Path()
+      ..moveTo(pSplit.dx, pSplit.dy)
+      ..quadraticBezierTo(
+        center.dx,
+        110 + center.dy / 2 - 50,
+        pPort3.dx,
+        pPort3.dy,
+      );
 
     canvas.drawPath(pathIn, paintCopper);
+
     paintCopper.strokeWidth = wTop;
     canvas.drawPath(pathTop, paintCopper);
+
     paintCopper.strokeWidth = wBot;
     canvas.drawPath(pathBot, paintCopper);
 
@@ -83,12 +87,28 @@ class WilkinsonPainter extends CustomPainter {
     _drawText(canvas, "Port 3", pPort3 + const Offset(15, 0));
 
     double waveFreq = controller.frequency * 0.08;
-    double phaseShift = pi / 2 * (controller.frequency / 3.0);
 
-    // 改这里：输入红色，输出蓝色
-    _drawPathWave(canvas, pathIn, Colors.red, 1.0, waveFreq, 0);
-    _drawPathWave(canvas, pathTop, Colors.blue, controller.s21, waveFreq, phaseShift);
-    _drawPathWave(canvas, pathBot, Colors.blue, controller.s31, waveFreq, phaseShift);
+    // 输入波：参考相位 0
+    _drawPathWave(canvas, pathIn, Colors.red, 1.0, waveFreq, 0.0);
+
+    // 输出波：使用 controller 计算得到的相位
+    _drawPathWave(
+      canvas,
+      pathTop,
+      Colors.blue,
+      controller.s21,
+      waveFreq,
+      0.0,
+    );
+
+    _drawPathWave(
+      canvas,
+      pathBot,
+      Colors.blue,
+      controller.s31,
+      waveFreq,
+      0.0,
+    );
   }
 
   void _drawOutputLoad(Canvas canvas, Offset portPos, double rVal, String label) {
@@ -230,7 +250,14 @@ class WilkinsonPainter extends CustomPainter {
     tp.paint(canvas, pos);
   }
 
-  void _drawPathWave(Canvas canvas, Path followPath, Color color, double amp, double k, double phaseOffset) {
+  void _drawPathWave(
+    Canvas canvas,
+    Path followPath,
+    Color color,
+    double amp,
+    double k,
+    double phaseOffset,
+  ) {
     if (amp < 0.05) return;
 
     final paint = Paint()
@@ -249,6 +276,7 @@ class WilkinsonPainter extends CustomPainter {
 
         double phase = d * k - animationValue * 2 * pi - phaseOffset;
         double offsetVal = 8.0 * amp * sin(phase);
+
         double nx = -t.vector.dy;
         double ny = t.vector.dx;
         double x = t.position.dx + nx * offsetVal;

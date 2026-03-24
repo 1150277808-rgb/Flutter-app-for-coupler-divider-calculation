@@ -3,12 +3,13 @@ import 'bl_globalvar.dart';
 
 class BranchLineParamEditor extends StatefulWidget {
   final BranchLineController controller;
-  final Function(double) onUpdate;
+  // 1. 定义回调函数：当用户点击Update时，不仅更新变量，还要通知外部去计算
+  final Function(double) onUpdate; 
 
   const BranchLineParamEditor({
     super.key,
     required this.controller,
-    required this.onUpdate,
+    required this.onUpdate, // 2. 构造函数里必须接收这个方法
   });
 
   @override
@@ -16,88 +17,31 @@ class BranchLineParamEditor extends StatefulWidget {
 }
 
 class _BranchLineParamEditorState extends State<BranchLineParamEditor> {
-  late TextEditingController _freqCtrl;
-  late TextEditingController _z0Ctrl;
-  late TextEditingController _zhCtrl;
-  late TextEditingController _zvCtrl;
+  late TextEditingController _textController;
 
   @override
   void initState() {
     super.initState();
-    _freqCtrl =
-        TextEditingController(text: widget.controller.freqGHz.toStringAsFixed(4));
-    _z0Ctrl =
-        TextEditingController(text: widget.controller.z0.toStringAsFixed(4));
-    _zhCtrl =
-        TextEditingController(text: widget.controller.zh.toStringAsFixed(4));
-    _zvCtrl =
-        TextEditingController(text: widget.controller.zv.toStringAsFixed(4));
+    _textController = TextEditingController(text: widget.controller.freqGHz.toString());
   }
 
   @override
   void dispose() {
-    _freqCtrl.dispose();
-    _z0Ctrl.dispose();
-    _zhCtrl.dispose();
-    _zvCtrl.dispose();
+    _textController.dispose();
     super.dispose();
   }
 
   void _handleUpdate() {
-    final f = double.tryParse(_freqCtrl.text);
-    final z0 = double.tryParse(_z0Ctrl.text);
-    final zh = double.tryParse(_zhCtrl.text);
-    final zv = double.tryParse(_zvCtrl.text);
+    final double? val = double.tryParse(_textController.text);
 
-    widget.controller.setParameters(
-      frequency: f,
-      z0: z0,
-      zh: zh,
-      zv: zv,
-      notify: false,
-    );
-
-    widget.onUpdate(widget.controller.freqGHz);
-  }
-
-  void _handleReset() {
-    widget.controller.resetToIdeal();
-
-    _freqCtrl.text = widget.controller.freqGHz.toStringAsFixed(4);
-    _z0Ctrl.text = widget.controller.z0.toStringAsFixed(4);
-    _zhCtrl.text = widget.controller.zh.toStringAsFixed(4);
-    _zvCtrl.text = widget.controller.zv.toStringAsFixed(4);
-
-    widget.onUpdate(widget.controller.freqGHz);
-  }
-
-  Widget _buildSmallField(String label, TextEditingController controller) {
-    return Expanded(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            label,
-            style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500),
-          ),
-          const SizedBox(height: 4),
-          TextField(
-            controller: controller,
-            keyboardType:
-                const TextInputType.numberWithOptions(decimal: true),
-            decoration: InputDecoration(
-              isDense: true,
-              contentPadding:
-                  const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8),
-              ),
-            ),
-            onSubmitted: (_) => _handleUpdate(),
-          ),
-        ],
-      ),
-    );
+    if (val != null) {
+      // 3. 核心修复：
+      // 先更新控制器的频率 (让动画和界面变)
+      widget.controller.setFrequency(val);
+      
+      // 再调用回调函数 (触发 bl_main.dart 里的数学计算)
+      widget.onUpdate(val); 
+    }
   }
 
   @override
@@ -110,35 +54,21 @@ class _BranchLineParamEditorState extends State<BranchLineParamEditor> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              "Settings",
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                color: Colors.indigo,
-              ),
-            ),
+            const Text("Settings", 
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.indigo)),
             const Divider(),
             const SizedBox(height: 10),
-
             Row(
               children: [
-                const Text(
-                  "Frequency (GHz):  ",
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
-                ),
+                const Text("Frequency (GHz):  ", style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
                 const SizedBox(width: 10),
                 Expanded(
                   child: TextField(
-                    controller: _freqCtrl,
-                    keyboardType:
-                        const TextInputType.numberWithOptions(decimal: true),
+                    controller: _textController,
+                    keyboardType: const TextInputType.numberWithOptions(decimal: true),
                     decoration: InputDecoration(
-                      contentPadding:
-                          const EdgeInsets.symmetric(horizontal: 10),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 10),
+                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
                       suffixText: "GHz",
                       hintText: "e.g. 3.0",
                     ),
@@ -157,26 +87,6 @@ class _BranchLineParamEditorState extends State<BranchLineParamEditor> {
                 ),
               ],
             ),
-
-            const SizedBox(height: 12),
-
-            Row(
-              children: [
-                _buildSmallField("Z0 (Ω)", _z0Ctrl),
-                const SizedBox(width: 10),
-                _buildSmallField("Zh (Ω)", _zhCtrl),
-                const SizedBox(width: 10),
-                _buildSmallField("Zv (Ω)", _zvCtrl),
-              ],
-            ),
-
-            const SizedBox(height: 10),
-            Text(
-              "Ideal design near f0=${widget.controller.centerFreq.toStringAsFixed(1)} GHz: "
-              "Zh=Z0/√2, Zv=Z0",
-              style: TextStyle(fontSize: 12, color: Colors.grey[700]),
-            ),
-
             Padding(
               padding: const EdgeInsets.only(top: 12.0),
               child: Row(
@@ -184,14 +94,20 @@ class _BranchLineParamEditorState extends State<BranchLineParamEditor> {
                   Icon(Icons.info_outline, size: 16, color: Colors.grey[600]),
                   const SizedBox(width: 5),
                   Text(
-                    "Center Freq = ${widget.controller.centerFreq} GHz (90° branch length)",
+                    "Center Freq = ${widget.controller.centerFreq} GHz (90° Shift)",
                     style: TextStyle(fontSize: 12, color: Colors.grey[600]),
                   ),
                   const Spacer(),
                   TextButton(
-                    onPressed: _handleReset,
+                    onPressed: () {
+                      // 重置逻辑
+                      double def = widget.controller.centerFreq;
+                      widget.controller.setFrequency(def);
+                      _textController.text = def.toString();
+                      widget.onUpdate(def); // 重置时也触发计算
+                    },
                     child: const Text("Reset"),
-                  ),
+                  )
                 ],
               ),
             ),

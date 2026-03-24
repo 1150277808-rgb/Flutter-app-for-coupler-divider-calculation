@@ -1,77 +1,125 @@
-import 'dart:math';
+import 'dart:math' as math;
 import 'package:flutter/material.dart';
+
+class WdSample {
+  final double frequency;
+  final double theta;
+  final double s11;
+  final double s21;
+  final double s31;
+  final double s23;
+
+  const WdSample({
+    required this.frequency,
+    required this.theta,
+    required this.s11,
+    required this.s21,
+    required this.s31,
+    required this.s23,
+  });
+}
 
 class WilkinsonController extends ChangeNotifier {
   // 系统参数
   final double z0 = 50.0;
   final double designFreq = 3.0;
-  
-  double frequency = 3.0;
-  
-  // 核心变量：功率比 K^2 = P3 / P2
-  double kSquared = 1.0; 
-  
-  // 新增：对应的 dB 值 (方便 UI 显示)
-  double splitDB = 0.0; 
 
-  // 电路元件参数
+  double frequency = 3.0;
+
+  // 功率比 K^2 = P3 / P2
+  double kSquared = 1.0;
+
+  // 对应 dB：10log10(P3/P2)
+  double splitDB = 0.0;
+
+  // 电路参数
   double z02 = 70.71;
   double z03 = 70.71;
   double rIso = 100.0;
-  // 新增：输出端负载电阻
   double r2 = 50.0;
   double r3 = 50.0;
 
-  // S参数仿真结果
+  // 当前频点 S 参数幅度
   double s11 = 0.0;
   double s21 = 0.707;
   double s31 = 0.707;
   double s23 = 0.0;
+
+  WilkinsonController() {
+    recalc(notify: false);
+  }
+
+  double get k => math.sqrt(kSquared);
 
   void setFrequency(double val) {
     frequency = val;
     recalc();
   }
 
-  // 新增：通过 dB 设置功率比 (User Requirement 2)
   void setSplitDB(double dbVal) {
     splitDB = dbVal;
-    // dB = 10 * log10(P3/P2)
-    // P3/P2 = 10^(dB/10)
-    kSquared = pow(10, dbVal / 10.0).toDouble();
+    kSquared = math.pow(10, dbVal / 10.0).toDouble();
     recalc();
   }
 
-  void recalc() {
-    double k = sqrt(kSquared); // K parameter
+  double electricalLengthAt(double f) {
+    return math.pi / 2.0 * (f / designFreq);
+  }
 
-    // 1. 计算传输线阻抗
-    z03 = z0 * sqrt((1 + kSquared) / pow(k, 3));
-    z02 = kSquared * z03; // 或者 z0 * sqrt(k * (1 + k*k))
+  WdSample sampleAt(double f) {
+    final theta = electricalLengthAt(f);
 
-    // 2. 计算隔离电阻
-    rIso = z0 * (k + 1/k);
+    // 教学演示用频率响应模型：
+    // 在 f0 时 sin(theta)=1 -> 完美分功
+    // 偏离 f0 时，反射与隔离恶化
+    final double sinTheta = math.sin(theta).abs();
+    final double cosTheta = math.cos(theta).abs();
 
-    // 3. 新增：计算输出端负载电阻 (User Requirement 1)
-    // 课件公式: R2 = Z0 * K, R3 = Z0 / K
-    r2 = z0 * k;
-    r3 = z0 / k;
+    final double p2Ratio = 1.0 / (1.0 + kSquared);
+    final double p3Ratio = kSquared / (1.0 + kSquared);
 
-    // --- S 参数仿真 (保持不变) ---
-    double mismatch = (frequency - designFreq).abs() / designFreq;
-    double matchFactor = max(0, 1.0 - 1.5 * mismatch);
+    final double s21Val = math.sqrt(p2Ratio) * sinTheta;
+    final double s31Val = math.sqrt(p3Ratio) * sinTheta;
+    final double s11Val = cosTheta;
+    final double s23Val = cosTheta;
 
-    s11 = 0.9 * (1.0 - matchFactor); 
+    return WdSample(
+      frequency: f,
+      theta: theta,
+      s11: s11Val.clamp(0.0, 1.0),
+      s21: s21Val.clamp(0.0, 1.0),
+      s31: s31Val.clamp(0.0, 1.0),
+      s23: s23Val.clamp(0.0, 1.0),
+    );
+  }
 
-    double pTotal = 1.0 - (s11 * s11);
-    double p2_ratio = 1 / (1 + kSquared);
-    double p3_ratio = kSquared / (1 + kSquared);
+  List<WdSample> sweepSamples({
+    double minFreq = 1.0,
+    double maxFreq = 5.0,
+    int count = 81,
+  }) {
+    final double step = (maxFreq - minFreq) / (count - 1);
+    return List.generate(count, (i) => sampleAt(minFreq + i * step));
+  }
 
-    s21 = sqrt(pTotal * p2_ratio);
-    s31 = sqrt(pTotal * p3_ratio);
-    s23 = 0.8 * (1.0 - matchFactor);
+  void recalc({bool notify = true}) {
+    final double kk = k;
 
-    notifyListeners();
+    // 设计公式
+    z03 = z0 * math.sqrt((1 + kSquared) / math.pow(kk, 3));
+    z02 = kSquared * z03;
+    rIso = z0 * (kk + 1 / kk);
+    r2 = z0 * kk;
+    r3 = z0 / kk;
+
+    // 当前频点 S 参数
+    final sample = sampleAt(frequency);
+    s11 = sample.s11;
+    s21 = sample.s21;
+    s31 = sample.s31;
+    s23 = sample.s23;
+
+    if (notify) notifyListeners();
   }
 }
 
