@@ -188,7 +188,7 @@ class BranchLineSteps extends StatelessWidget {
             ),
 
             _buildMathCard(
-              title: "Step 4: Actual Simulation (Current f)",
+              title: "Step 4: Actual Calculation (Current f)",
               content: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -227,6 +227,40 @@ class BranchLineSteps extends StatelessWidget {
                     'Electrical length: θ = ${controller.theta.toStringAsFixed(4)} rad (${thetaDeg.toStringAsFixed(2)}°)',
                   ),
                   const SizedBox(height: 10),
+
+                  // 添加详细计算步骤
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: Colors.blue.withOpacity(0.05),
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: Colors.blue.withOpacity(0.2)),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text("Detailed Calculation Steps:", style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600)),
+                        const SizedBox(height: 6),
+                        const Text("Step 1: Calculate complex S-parameters at current frequency:", style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600)),
+                        const SizedBox(height: 4),
+                        Text("S₂₁ = -j/√2 × sin(θ) × e^(-jθ) = ${controller.s2_mag.toStringAsFixed(4)} ∠ ${_radToDeg(controller.s2_phase).toStringAsFixed(1)}°", style: const TextStyle(fontSize: 10)),
+                        Text("S₃₁ = -j/√2 × sin(θ) × e^(-jθ) = ${controller.s3_mag.toStringAsFixed(4)} ∠ ${_radToDeg(controller.s3_phase).toStringAsFixed(1)}°", style: const TextStyle(fontSize: 10)),
+                        Text("S₄₁ = cos(θ) = ${controller.s4_mag.toStringAsFixed(4)} ∠ ${_radToDeg(controller.s4_phase).toStringAsFixed(1)}°", style: const TextStyle(fontSize: 10)),
+                        Text("S₁₁ = cos(θ) = ${controller.s1_mag.toStringAsFixed(4)} ∠ ${_radToDeg(controller.s1_phase).toStringAsFixed(1)}°", style: const TextStyle(fontSize: 10)),
+                        const SizedBox(height: 8),
+                        const Text("Step 2: Convert magnitude to dB using 20×log₁₀(|S|):", style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600)),
+                        const SizedBox(height: 4),
+                        Text("S₂₁ = 20×log₁₀(${controller.s2_mag.toStringAsFixed(4)}) = ${s21dB.toStringAsFixed(2)} dB", style: const TextStyle(fontSize: 10)),
+                        Text("S₃₁ = 20×log₁₀(${controller.s3_mag.toStringAsFixed(4)}) = ${s31dB.toStringAsFixed(2)} dB", style: const TextStyle(fontSize: 10)),
+                        Text("S₄₁ = 20×log₁₀(${controller.s4_mag.toStringAsFixed(4)}) = ${s41dB.toStringAsFixed(2)} dB", style: const TextStyle(fontSize: 10)),
+                        Text("S₁₁ = 20×log₁₀(${controller.s1_mag.toStringAsFixed(4)}) = ${s11dB.toStringAsFixed(2)} dB", style: const TextStyle(fontSize: 10)),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+
+                  const Text("Final S-parameters:", style: TextStyle(fontWeight: FontWeight.w600)),
+                  const SizedBox(height: 6),
                   _buildResultRow(
                     "Through |S21|",
                     controller.s2_mag,
@@ -292,7 +326,7 @@ class BranchLineSteps extends StatelessWidget {
       child: const Column(
         children: [
           Text(
-            "Theoretical Derivation vs. Frequency-Dependent Simulation",
+            "Theoretical Derivation vs. Frequency-Dependent Calculation",
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,

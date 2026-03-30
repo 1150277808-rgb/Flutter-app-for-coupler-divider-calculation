@@ -228,7 +228,7 @@ class HomePage extends StatelessWidget {
               const SizedBox(height: 10),
               Row(
                 children: [
-                  Text("Open Simulation", style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: color)),
+                  Text("Open Calculation", style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: color)),
                   const SizedBox(width: 4),
                   Icon(Icons.arrow_forward, size: 14, color: color)
                 ],

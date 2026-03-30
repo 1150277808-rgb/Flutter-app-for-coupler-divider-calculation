@@ -258,7 +258,7 @@ class WilkinsonPainter extends CustomPainter {
     double k,
     double phaseOffset,
   ) {
-    if (amp < 0.05) return;
+    if (amp < 0.01) return; // 降低阈值，让小幅度波形也能显示
 
     final paint = Paint()
       ..color = color
@@ -275,7 +275,8 @@ class WilkinsonPainter extends CustomPainter {
         if (t == null) continue;
 
         double phase = d * k - animationValue * 2 * pi - phaseOffset;
-        double offsetVal = 8.0 * amp * sin(phase);
+        // 增加波形幅度以便在小信号时也能看见
+        double offsetVal = 10.0 * max(amp, 0.1) * sin(phase);
 
         double nx = -t.vector.dy;
         double ny = t.vector.dx;

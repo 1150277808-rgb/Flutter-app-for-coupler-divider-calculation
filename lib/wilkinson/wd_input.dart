@@ -1,10 +1,37 @@
 import 'package:flutter/material.dart';
 import 'wd_globalvar.dart';
 
-class WilkinsonInput extends StatelessWidget {
+class WilkinsonInput extends StatefulWidget {
   final WilkinsonController controller;
 
   const WilkinsonInput({super.key, required this.controller});
+
+  @override
+  State<WilkinsonInput> createState() => _WilkinsonInputState();
+}
+
+class _WilkinsonInputState extends State<WilkinsonInput> {
+  late TextEditingController _freqController;
+
+  @override
+  void initState() {
+    super.initState();
+    _freqController = TextEditingController(text: widget.controller.frequency.toStringAsFixed(2));
+    widget.controller.addListener(_updateFreqText);
+  }
+
+  @override
+  void dispose() {
+    widget.controller.removeListener(_updateFreqText);
+    _freqController.dispose();
+    super.dispose();
+  }
+
+  void _updateFreqText() {
+    if (!_freqController.selection.isValid) {
+      _freqController.text = widget.controller.frequency.toStringAsFixed(2);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -12,7 +39,7 @@ class WilkinsonInput extends StatelessWidget {
       margin: const EdgeInsets.all(16),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: const Color(0xFFF0F2F8), 
+        color: const Color(0xFFF0F2F8),
         borderRadius: BorderRadius.circular(12),
       ),
       child: Column(
@@ -20,23 +47,38 @@ class WilkinsonInput extends StatelessWidget {
         children: [
           const Text("Settings", style: TextStyle(fontWeight: FontWeight.bold, color: Colors.indigo)),
           const SizedBox(height: 12),
-          
-          // Frequency Slider (不变)
+
           Row(
             children: [
               const Text("Freq (GHz): "),
-              Text(controller.frequency.toStringAsFixed(1), style: const TextStyle(fontWeight: FontWeight.bold)),
-              Expanded(
-                child: SizedBox(
-                  height: 30,
-                  child: Slider(
-                    value: controller.frequency,
-                    min: 1.0,
-                    max: 5.0,
-                    divisions: 40,
-                    onChanged: (v) => controller.setFrequency(v),
+              const SizedBox(width: 8),
+              SizedBox(
+                width: 100,
+                child: TextField(
+                  controller: _freqController,
+                  keyboardType: TextInputType.number,
+                  decoration: const InputDecoration(
+                    isDense: true,
+                    contentPadding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+                    border: OutlineInputBorder(),
                   ),
+                  onSubmitted: (val) {
+                    final freq = double.tryParse(val);
+                    if (freq != null && freq > 0) {
+                      widget.controller.setFrequency(freq);
+                    }
+                  },
                 ),
+              ),
+              const SizedBox(width: 8),
+              ElevatedButton(
+                onPressed: () {
+                  final freq = double.tryParse(_freqController.text);
+                  if (freq != null && freq > 0) {
+                    widget.controller.setFrequency(freq);
+                  }
+                },
+                child: const Text("Update"),
               ),
             ],
           ),
@@ -52,28 +94,28 @@ class WilkinsonInput extends StatelessWidget {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
-                  Text("${controller.splitDB.toStringAsFixed(1)} dB", 
+                  Text("${widget.controller.splitDB.toStringAsFixed(1)} dB",
                     style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.indigo, fontSize: 16)),
-                  Text("(K² = ${controller.kSquared.toStringAsFixed(2)})", 
+                  Text("(K² = ${widget.controller.kSquared.toStringAsFixed(2)})",
                     style: const TextStyle(fontSize: 10, color: Colors.grey)),
                 ],
               ),
             ],
           ),
-          
+
           SizedBox(
             height: 30,
             child: ListenableBuilder(
-              listenable: controller,
+              listenable: widget.controller,
               builder: (context, _) {
                 return Slider(
-                  value: controller.splitDB,
-                  min: 0.0,     // 0 dB (1:1)
-                  max: 20.0,    // 10 dB (1:10)
-                  divisions: 200, // 细粒度调节
+                  value: widget.controller.splitDB,
+                  min: 0.0,
+                  max: 20.0,
+                  divisions: 200,
                   activeColor: Colors.orange,
-                  label: "${controller.splitDB.toStringAsFixed(1)} dB",
-                  onChanged: (v) => controller.setSplitDB(v), // 调用新的 setSplitDB
+                  label: "${widget.controller.splitDB.toStringAsFixed(1)} dB",
+                  onChanged: (v) => widget.controller.setSplitDB(v),
                 );
               },
             ),

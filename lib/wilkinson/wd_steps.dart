@@ -194,7 +194,7 @@ class WilkinsonSteps extends StatelessWidget {
             final s23dB = _toDb(sample.s23);
 
             return _buildStepTile(
-              title: "Step 4: Frequency-Dependent S(f) + Plot",
+              title: "Step 4: Frequency-Dependent S(f)",
               children: [
                 const Text(
                   "To include frequency response, define the electrical length of each quarter-wave branch as:",
@@ -241,7 +241,39 @@ class WilkinsonSteps extends StatelessWidget {
 
                 const SizedBox(height: 12),
                 const Text(
-                  "Current-frequency result (magnitude in dB):",
+                  "Detailed Calculation Steps:",
+                  style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
+                ),
+                const SizedBox(height: 8),
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: Colors.blue.withOpacity(0.05),
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: Colors.blue.withOpacity(0.2)),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text("Step 1: Substitute frequency into S-parameters to get complex values:", style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600)),
+                      const SizedBox(height: 6),
+                      Text("S₁₁(f) = cos(θ) = cos(${sample.theta.toStringAsFixed(3)}) = ${sample.s11.toStringAsFixed(4)}", style: const TextStyle(fontSize: 11)),
+                      Text("S₂₁(f) = √(1/(1+K²)) × sin(θ) = √(1/${(1+controller.kSquared).toStringAsFixed(2)}) × sin(${sample.theta.toStringAsFixed(3)}) = ${sample.s21.toStringAsFixed(4)}", style: const TextStyle(fontSize: 11)),
+                      Text("S₃₁(f) = √(K²/(1+K²)) × sin(θ) = √(${controller.kSquared.toStringAsFixed(2)}/${(1+controller.kSquared).toStringAsFixed(2)}) × sin(${sample.theta.toStringAsFixed(3)}) = ${sample.s31.toStringAsFixed(4)}", style: const TextStyle(fontSize: 11)),
+                      Text("S₂₃(f) = cos(θ) = ${sample.s23.toStringAsFixed(4)}", style: const TextStyle(fontSize: 11)),
+                      const SizedBox(height: 8),
+                      const Text("Step 2: Convert magnitude to dB using 20×log₁₀(|S|):", style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600)),
+                      const SizedBox(height: 6),
+                      Text("S₁₁ = 20×log₁₀(${sample.s11.toStringAsFixed(4)}) = ${s11dB.toStringAsFixed(2)} dB", style: const TextStyle(fontSize: 11)),
+                      Text("S₂₁ = 20×log₁₀(${sample.s21.toStringAsFixed(4)}) = ${s21dB.toStringAsFixed(2)} dB", style: const TextStyle(fontSize: 11)),
+                      Text("S₃₁ = 20×log₁₀(${sample.s31.toStringAsFixed(4)}) = ${s31dB.toStringAsFixed(2)} dB", style: const TextStyle(fontSize: 11)),
+                      Text("S₂₃ = 20×log₁₀(${sample.s23.toStringAsFixed(4)}) = ${s23dB.toStringAsFixed(2)} dB", style: const TextStyle(fontSize: 11)),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 12),
+                const Text(
+                  "Final S-parameters (dB):",
                   style: TextStyle(fontWeight: FontWeight.w600),
                 ),
                 const SizedBox(height: 6),
@@ -254,36 +286,6 @@ class WilkinsonSteps extends StatelessWidget {
                     _buildValueChip("S31", s31dB, Colors.purple),
                     _buildValueChip("S23", s23dB, Colors.green),
                   ],
-                ),
-
-                const SizedBox(height: 14),
-                Container(
-                  padding: const EdgeInsets.all(10),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    border: Border.all(color: const Color(0xFFE6E6E6)),
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: Column(
-                    children: [
-                      SizedBox(
-                        height: 260,
-                        child: _WdSParameterPlot(controller: controller),
-                      ),
-                      const SizedBox(height: 10),
-                      Wrap(
-                        alignment: WrapAlignment.center,
-                        spacing: 14,
-                        runSpacing: 8,
-                        children: const [
-                          _PlotLegendItem(color: Colors.red, text: "S11"),
-                          _PlotLegendItem(color: Colors.blue, text: "S21"),
-                          _PlotLegendItem(color: Colors.purple, text: "S31"),
-                          _PlotLegendItem(color: Colors.green, text: "S23"),
-                        ],
-                      ),
-                    ],
-                  ),
                 ),
               ],
             );
@@ -300,7 +302,7 @@ class WilkinsonSteps extends StatelessWidget {
 
             return ExpansionTile(
               title: const Text(
-                "Step 5: Simulation Results",
+                "Step 5: Final Results",
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
               initiallyExpanded: true,
@@ -403,270 +405,6 @@ class WilkinsonSteps extends StatelessWidget {
           fontSize: 12,
         ),
       ),
-    );
-  }
-}
-
-class _WdSParameterPlot extends StatelessWidget {
-  final WilkinsonController controller;
-
-  const _WdSParameterPlot({required this.controller});
-
-  @override
-  Widget build(BuildContext context) {
-    return ListenableBuilder(
-      listenable: controller,
-      builder: (context, _) {
-        return CustomPaint(
-          painter: _WdSParameterPlotPainter(
-            samples: controller.sweepSamples(),
-            currentFrequency: controller.frequency,
-          ),
-          size: Size.infinite,
-        );
-      },
-    );
-  }
-}
-
-class _WdSParameterPlotPainter extends CustomPainter {
-  final List<WdSample> samples;
-  final double currentFrequency;
-
-  _WdSParameterPlotPainter({
-    required this.samples,
-    required this.currentFrequency,
-  });
-
-  double _toDb(double mag) {
-    if (mag <= 0.0001) return -40.0;
-    final db = 20 * math.log(mag) / math.ln10;
-    return db.clamp(-40.0, 0.0);
-  }
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final bg = Paint()..color = const Color(0xFFFDFDFD);
-    final border = Paint()
-      ..color = const Color(0xFFE0E0E0)
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 1;
-
-    final rect = RRect.fromRectAndRadius(
-      Offset.zero & size,
-      const Radius.circular(8),
-    );
-    canvas.drawRRect(rect, bg);
-    canvas.drawRRect(rect, border);
-
-    const leftPad = 42.0;
-    const rightPad = 14.0;
-    const topPad = 16.0;
-    const bottomPad = 28.0;
-
-    final plot = Rect.fromLTWH(
-      leftPad,
-      topPad,
-      size.width - leftPad - rightPad,
-      size.height - topPad - bottomPad,
-    );
-
-    final gridPaint = Paint()
-      ..color = const Color(0xFFEAEAEA)
-      ..strokeWidth = 1;
-
-    final axisPaint = Paint()
-      ..color = const Color(0xFF9E9E9E)
-      ..strokeWidth = 1.2;
-
-    const minF = 1.0;
-    const maxF = 5.0;
-    const minDb = -40.0;
-    const maxDb = 0.0;
-
-    double xOf(double f) => plot.left + (f - minF) / (maxF - minF) * plot.width;
-    double yOf(double db) => plot.bottom - (db - minDb) / (maxDb - minDb) * plot.height;
-
-    for (double db = -40; db <= 0; db += 10) {
-      final y = yOf(db);
-      canvas.drawLine(Offset(plot.left, y), Offset(plot.right, y), gridPaint);
-      _paintText(
-        canvas,
-        "${db.toInt()} dB",
-        Offset(4, y - 7),
-        const TextStyle(fontSize: 10, color: Colors.black54),
-      );
-    }
-
-    for (double f = 1; f <= 5; f += 1) {
-      final x = xOf(f);
-      canvas.drawLine(Offset(x, plot.top), Offset(x, plot.bottom), gridPaint);
-      _paintText(
-        canvas,
-        "${f.toInt()}",
-        Offset(x - 6, plot.bottom + 6),
-        const TextStyle(fontSize: 10, color: Colors.black54),
-      );
-    }
-
-    canvas.drawLine(Offset(plot.left, plot.top), Offset(plot.left, plot.bottom), axisPaint);
-    canvas.drawLine(Offset(plot.left, plot.bottom), Offset(plot.right, plot.bottom), axisPaint);
-
-    _paintText(
-      canvas,
-      "Freq (GHz)",
-      Offset(plot.center.dx - 24, size.height - 18),
-      const TextStyle(fontSize: 11, color: Colors.black87, fontWeight: FontWeight.w500),
-    );
-
-    _drawCurve(
-      canvas,
-      plot,
-      samples,
-      (s) => _toDb(s.s11),
-      Colors.red,
-      xOf,
-      yOf,
-    );
-    _drawCurve(
-      canvas,
-      plot,
-      samples,
-      (s) => _toDb(s.s21),
-      Colors.blue,
-      xOf,
-      yOf,
-    );
-    _drawCurve(
-      canvas,
-      plot,
-      samples,
-      (s) => _toDb(s.s31),
-      Colors.purple,
-      xOf,
-      yOf,
-    );
-    _drawCurve(
-      canvas,
-      plot,
-      samples,
-      (s) => _toDb(s.s23),
-      Colors.green,
-      xOf,
-      yOf,
-    );
-
-    final currentX = xOf(currentFrequency);
-    final dashPaint = Paint()
-      ..color = Colors.black45
-      ..strokeWidth = 1;
-
-    for (double y = plot.top; y < plot.bottom; y += 6) {
-      canvas.drawLine(
-        Offset(currentX, y),
-        Offset(currentX, math.min(y + 3, plot.bottom)),
-        dashPaint,
-      );
-    }
-
-    final cur = samples.reduce(
-      (a, b) => (a.frequency - currentFrequency).abs() < (b.frequency - currentFrequency).abs() ? a : b,
-    );
-
-    _drawMarker(canvas, Offset(currentX, yOf(_toDb(cur.s11))), Colors.red);
-    _drawMarker(canvas, Offset(currentX, yOf(_toDb(cur.s21))), Colors.blue);
-    _drawMarker(canvas, Offset(currentX, yOf(_toDb(cur.s31))), Colors.purple);
-    _drawMarker(canvas, Offset(currentX, yOf(_toDb(cur.s23))), Colors.green);
-  }
-
-  void _drawCurve(
-    Canvas canvas,
-    Rect plot,
-    List<WdSample> data,
-    double Function(WdSample) valueOf,
-    Color color,
-    double Function(double) xOf,
-    double Function(double) yOf,
-  ) {
-    final path = Path();
-    for (int i = 0; i < data.length; i++) {
-      final x = xOf(data[i].frequency);
-      final y = yOf(valueOf(data[i]));
-      if (i == 0) {
-        path.moveTo(x, y);
-      } else {
-        path.lineTo(x, y);
-      }
-    }
-
-    final p = Paint()
-      ..color = color
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 2.0
-      ..strokeCap = StrokeCap.round
-      ..strokeJoin = StrokeJoin.round;
-
-    canvas.save();
-    canvas.clipRect(plot);
-    canvas.drawPath(path, p);
-    canvas.restore();
-  }
-
-  void _drawMarker(Canvas canvas, Offset center, Color color) {
-    final fill = Paint()..color = color;
-    final stroke = Paint()
-      ..color = Colors.white
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 1.5;
-
-    canvas.drawCircle(center, 4.2, fill);
-    canvas.drawCircle(center, 4.2, stroke);
-  }
-
-  void _paintText(Canvas canvas, String text, Offset offset, TextStyle style) {
-    final tp = TextPainter(
-      text: TextSpan(text: text, style: style),
-      textDirection: TextDirection.ltr,
-    );
-    tp.layout();
-    tp.paint(canvas, offset);
-  }
-
-  @override
-  bool shouldRepaint(covariant _WdSParameterPlotPainter oldDelegate) {
-    return oldDelegate.currentFrequency != currentFrequency ||
-        oldDelegate.samples != samples;
-  }
-}
-
-class _PlotLegendItem extends StatelessWidget {
-  final Color color;
-  final String text;
-
-  const _PlotLegendItem({
-    required this.color,
-    required this.text,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Container(
-          width: 10,
-          height: 10,
-          decoration: BoxDecoration(
-            color: color,
-            shape: BoxShape.circle,
-          ),
-        ),
-        const SizedBox(width: 5),
-        Text(
-          text,
-          style: const TextStyle(fontSize: 12, color: Colors.black54),
-        ),
-      ],
     );
   }
 }

@@ -26,7 +26,7 @@ class _CouplerMainState extends State<CouplerMain> {
       length: 2,
       child: Scaffold(
         appBar: AppBar(
-          title: const Text("Rat-Race Coupler Simulation"),
+          title: const Text("Rat-Race Coupler Calculation"),
           backgroundColor: const Color(0xFFF5F6FA),
           surfaceTintColor: Colors.transparent,
           titleTextStyle: const TextStyle(
@@ -40,7 +40,7 @@ class _CouplerMainState extends State<CouplerMain> {
             unselectedLabelColor: Colors.black54,
             indicatorColor: Colors.indigo,
             tabs: [
-              Tab(text: "Simulation"),
+              Tab(text: "Calculation"),
               Tab(text: "Schematic"),
             ],
           ),

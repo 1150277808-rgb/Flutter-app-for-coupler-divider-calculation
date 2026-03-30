@@ -94,13 +94,20 @@ class WilkinsonController extends ChangeNotifier {
   }
 
   List<WdSample> sweepSamples({
-    double minFreq = 1.0,
-    double maxFreq = 5.0,
+    double? minFreq,
+    double? maxFreq,
     int count = 81,
   }) {
-    final double step = (maxFreq - minFreq) / (count - 1);
-    return List.generate(count, (i) => sampleAt(minFreq + i * step));
+    // 根据当前频率动态设置范围
+    final double centerFreq = frequency;
+    final double fMin = minFreq ?? (centerFreq * 0.5);
+    final double fMax = maxFreq ?? (centerFreq * 1.5);
+    final double step = (fMax - fMin) / (count - 1);
+    return List.generate(count, (i) => sampleAt(fMin + i * step));
   }
+
+  double get sweepMinFreq => frequency * 0.5;
+  double get sweepMaxFreq => frequency * 1.5;
 
   void recalc({bool notify = true}) {
     final double kk = k;

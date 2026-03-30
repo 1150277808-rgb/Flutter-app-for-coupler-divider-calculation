@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'dart:math';
 
 class ResistiveDividerController extends ChangeNotifier {
   // 输入参数
@@ -58,6 +59,22 @@ class ResistiveDividerController extends ChangeNotifier {
     }
     updateResults();
   }
+
+  // 频率扫描（S参数不变，但为了一致性添加）
+  List<double> get sweepFreqGHz {
+    final fMin = frequency * 0.5;
+    final fMax = frequency * 1.5;
+    return List.generate(41, (i) => fMin + (fMax - fMin) * i / 40);
+  }
+
+  double _toDb(double mag) {
+    if (mag <= 1e-6) return -120.0;
+    return 20 * log(mag.abs()) / ln10;
+  }
+
+  List<double> get sweepS11dB => List.filled(41, _toDb(s11));
+  List<double> get sweepS21dB => List.filled(41, _toDb(s21));
+  List<double> get sweepS31dB => List.filled(41, _toDb(s31));
 }
 
 // 全局单例

@@ -29,7 +29,7 @@ class BranchLineMain extends StatelessWidget {
           iconTheme: const IconThemeData(color: Colors.black87),
           bottom: const TabBar(
             tabs: [
-              Tab(text: "Simulation"),
+              Tab(text: "Calculation"),
               Tab(text: "Schematic"),
             ],
           ),
@@ -79,6 +79,14 @@ class BranchLineMain extends StatelessWidget {
                               _LegendItem(color: Colors.blue, text: "Outgoing Wave"),
                               _LegendItem(color: Colors.grey, text: "Near Zero Output"),
                             ],
+                          ),
+                          const Padding(
+                            padding: EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                            child: Text(
+                              "Note: Waves may not be visible at very high frequencies.",
+                              style: TextStyle(fontSize: 11, color: Colors.black54, fontStyle: FontStyle.italic),
+                              textAlign: TextAlign.center,
+                            ),
                           ),
                           Expanded(
                             child: BranchLinePainterFrame(controller: blController),

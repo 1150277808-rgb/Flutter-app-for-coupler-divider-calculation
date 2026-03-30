@@ -55,6 +55,11 @@ class BranchLineSPlot extends StatelessWidget {
                     _LegendDot(color: Colors.black54, text: "Current f"),
                   ],
                 ),
+                const SizedBox(height: 8),
+                const Text(
+                  "Note: When curves overlap, only one line may be visible.",
+                  style: TextStyle(fontSize: 11, color: Colors.black54, fontStyle: FontStyle.italic),
+                ),
                 const SizedBox(height: 12),
                 SizedBox(
                   height: 300,
@@ -121,7 +126,13 @@ class _BlPlotPainter extends CustomPainter {
     final double xMin = freqs.first;
     final double xMax = freqs.last;
     const double yMax = 0.0;
-    const double yMin = -40.0;
+
+    // 动态计算Y轴最小值
+    double dataMin = -40.0;
+    for (final val in [...s11, ...s21, ...s31, ...s41]) {
+      if (val.isFinite && val < dataMin) dataMin = val;
+    }
+    final double yMin = ((dataMin / 10).floor() * 10).toDouble().clamp(-120.0, -10.0);
 
     final axisPaint = Paint()
       ..color = Colors.black87

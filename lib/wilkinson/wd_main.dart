@@ -4,6 +4,7 @@ import 'wd_globalvar.dart';
 import 'wd_painter.dart';
 import 'wd_steps.dart';
 import 'wd_input.dart';
+import 'wd_plot.dart';
 
 class WilkinsonMain extends StatefulWidget {
   const WilkinsonMain({super.key});
@@ -52,7 +53,7 @@ class _WilkinsonMainState extends State<WilkinsonMain> with SingleTickerProvider
           iconTheme: const IconThemeData(color: Colors.black87),
           bottom: const TabBar(
             tabs: [
-              Tab(text: "Simulation"),
+              Tab(text: "Calculation"),
               Tab(text: "Schematic"),
             ],
           ),
@@ -74,7 +75,12 @@ class _WilkinsonMainState extends State<WilkinsonMain> with SingleTickerProvider
                           child: SingleChildScrollView(
                             physics: const BouncingScrollPhysics(),
                             padding: const EdgeInsets.only(bottom: 40),
-                            child: WilkinsonSteps(controller: wdController),
+                            child: Column(
+                              children: [
+                                WilkinsonSPlot(controller: wdController),
+                                WilkinsonSteps(controller: wdController),
+                              ],
+                            ),
                           ),
                         ),
                       ),
@@ -93,6 +99,14 @@ class _WilkinsonMainState extends State<WilkinsonMain> with SingleTickerProvider
                             _LegendItem(color: Colors.red, text: "Excited Input"),
                             _LegendItem(color: Colors.blue, text: "Outgoing Wave"),
                           ],
+                        ),
+                        const Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                          child: Text(
+                            "Note: Waves may not be visible at very high frequencies.",
+                            style: TextStyle(fontSize: 11, color: Colors.black54, fontStyle: FontStyle.italic),
+                            textAlign: TextAlign.center,
+                          ),
                         ),
                         Expanded(
                           child: ClipRect(

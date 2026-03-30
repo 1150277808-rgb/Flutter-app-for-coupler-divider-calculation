@@ -309,4 +309,59 @@ class SourceController extends ChangeNotifier {
     while (x <= -180) x += 360;
     return x;
   }
+
+  // 频率扫描
+  List<double> get sweepFreqGHz {
+    final fMin = freqGHz * 0.5;
+    final fMax = freqGHz * 1.5;
+    return List.generate(41, (i) => fMin + (fMax - fMin) * i / 40);
+  }
+
+  List<double> sweepS11dB() {
+    return sweepFreqGHz.map((f) {
+      final oldFreq = freqGHz;
+      freqGHz = f;
+      calculateAll();
+      final result = 20 * log(b1.magnitude.clamp(1e-6, 1.0)) / ln10;
+      freqGHz = oldFreq;
+      calculateAll();
+      return result;
+    }).toList();
+  }
+
+  List<double> sweepS21dB() {
+    return sweepFreqGHz.map((f) {
+      final oldFreq = freqGHz;
+      freqGHz = f;
+      calculateAll();
+      final result = 20 * log(b2.magnitude.clamp(1e-6, 1.0)) / ln10;
+      freqGHz = oldFreq;
+      calculateAll();
+      return result;
+    }).toList();
+  }
+
+  List<double> sweepS31dB() {
+    return sweepFreqGHz.map((f) {
+      final oldFreq = freqGHz;
+      freqGHz = f;
+      calculateAll();
+      final result = 20 * log(b3.magnitude.clamp(1e-6, 1.0)) / ln10;
+      freqGHz = oldFreq;
+      calculateAll();
+      return result;
+    }).toList();
+  }
+
+  List<double> sweepS41dB() {
+    return sweepFreqGHz.map((f) {
+      final oldFreq = freqGHz;
+      freqGHz = f;
+      calculateAll();
+      final result = 20 * log(b4.magnitude.clamp(1e-6, 1.0)) / ln10;
+      freqGHz = oldFreq;
+      calculateAll();
+      return result;
+    }).toList();
+  }
 }

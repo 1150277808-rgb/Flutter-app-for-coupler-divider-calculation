@@ -38,6 +38,7 @@ class PolarizationSteps extends StatelessWidget {
         return Column(
           children: [
             _buildHeader(),
+            _buildSParameterPlot(controller),
 
             _buildMathCard(
               title: "Step 1: Even-Mode Analysis",
@@ -155,10 +156,37 @@ class PolarizationSteps extends StatelessWidget {
                         const SizedBox(width: 10),
                         Expanded(
                           child: Text(
-                            "Simulation Status:\nActive inputs: $active",
+                            "Calculation Status:\nActive inputs: $active",
                             style: TextStyle(fontSize: 13, color: Colors.brown[800]),
                           ),
                         ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  const Divider(),
+                  const SizedBox(height: 8),
+                  const Text(
+                    "S-Parameters at Current Frequency:",
+                    style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
+                  ),
+                  const SizedBox(height: 8),
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: Colors.blue.withOpacity(0.05),
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: Colors.blue.withOpacity(0.2)),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text("Frequency: ${controller.freqGHz.toStringAsFixed(2)} GHz", style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600)),
+                        const SizedBox(height: 8),
+                        Text("S₁₁ = ${controller.b1.magnitude.toStringAsFixed(4)} ∠ ${controller.getOutputPhaseDeg(1).toStringAsFixed(1)}° = ${(20 * math.log(controller.b1.magnitude.clamp(1e-6, 1.0)) / math.ln10).toStringAsFixed(2)} dB", style: const TextStyle(fontSize: 11)),
+                        Text("S₂₁ = ${controller.b2.magnitude.toStringAsFixed(4)} ∠ ${controller.getOutputPhaseDeg(2).toStringAsFixed(1)}° = ${(20 * math.log(controller.b2.magnitude.clamp(1e-6, 1.0)) / math.ln10).toStringAsFixed(2)} dB", style: const TextStyle(fontSize: 11)),
+                        Text("S₃₁ = ${controller.b3.magnitude.toStringAsFixed(4)} ∠ ${controller.getOutputPhaseDeg(3).toStringAsFixed(1)}° = ${(20 * math.log(controller.b3.magnitude.clamp(1e-6, 1.0)) / math.ln10).toStringAsFixed(2)} dB", style: const TextStyle(fontSize: 11)),
+                        Text("S₄₁ = ${controller.b4.magnitude.toStringAsFixed(4)} ∠ ${controller.getOutputPhaseDeg(4).toStringAsFixed(1)}° = ${(20 * math.log(controller.b4.magnitude.clamp(1e-6, 1.0)) / math.ln10).toStringAsFixed(2)} dB", style: const TextStyle(fontSize: 11)),
                       ],
                     ),
                   ),
@@ -356,4 +384,138 @@ class PolarizationSteps extends StatelessWidget {
       ),
     );
   }
+
+  Widget _buildSParameterPlot(SourceController controller) {
+    return Card(
+      margin: const EdgeInsets.all(12),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text("S-Parameters vs Frequency", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 6),
+            Text("Current frequency: ${controller.freqGHz.toStringAsFixed(2)} GHz", style: const TextStyle(color: Colors.indigo, fontWeight: FontWeight.w600)),
+            const SizedBox(height: 10),
+            const Wrap(spacing: 14, children: [
+              _LegendDot(color: Colors.red, text: "S11"),
+              _LegendDot(color: Colors.blue, text: "S21"),
+              _LegendDot(color: Colors.purple, text: "S31"),
+              _LegendDot(color: Colors.green, text: "S41"),
+            ]),
+            const SizedBox(height: 8),
+            const Text("Note: When curves overlap, only one line may be visible.", style: TextStyle(fontSize: 11, color: Colors.black54, fontStyle: FontStyle.italic)),
+            const SizedBox(height: 12),
+            SizedBox(height: 300, width: double.infinity, child: CustomPaint(painter: _CouplerPlotPainter(controller: controller))),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _LegendDot extends StatelessWidget {
+  final Color color;
+  final String text;
+  const _LegendDot({required this.color, required this.text});
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Container(width: 11, height: 11, decoration: BoxDecoration(color: color, shape: BoxShape.circle)),
+        const SizedBox(width: 5),
+        Text(text, style: const TextStyle(fontSize: 12)),
+      ],
+    );
+  }
+}
+
+class _CouplerPlotPainter extends CustomPainter {
+  final SourceController controller;
+  _CouplerPlotPainter({required this.controller});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final freqs = controller.sweepFreqGHz;
+    final s11 = controller.sweepS11dB();
+    final s21 = controller.sweepS21dB();
+    final s31 = controller.sweepS31dB();
+    final s41 = controller.sweepS41dB();
+
+    // Wilkinson样式：背景和边框
+    final bg = Paint()..color = const Color(0xFFFDFDFD);
+    final border = Paint()
+      ..color = const Color(0xFFE0E0E0)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1;
+
+    final rect = RRect.fromRectAndRadius(
+      Offset.zero & size,
+      const Radius.circular(8),
+    );
+    canvas.drawRRect(rect, bg);
+    canvas.drawRRect(rect, border);
+
+    const left = 42.0, right = 14.0, top = 16.0, bottom = 28.0;
+    final plot = Rect.fromLTWH(left, top, size.width - left - right, size.height - top - bottom);
+
+    final xMin = freqs.first, xMax = freqs.last;
+    final allVals = [...s11, ...s21, ...s31, ...s41];
+    final yMin = (allVals.reduce((a, b) => a < b ? a : b) / 10).floor() * 10.0;
+    final yMax = 0.0;
+
+    final gridPaint = Paint()
+      ..color = const Color(0xFFEAEAEA)
+      ..strokeWidth = 1;
+
+    final axisPaint = Paint()
+      ..color = const Color(0xFF9E9E9E)
+      ..strokeWidth = 1.2;
+
+    double xOf(double f) => plot.left + (f - xMin) / (xMax - xMin) * plot.width;
+    double yOf(double db) => plot.bottom - (db - yMin) / (yMax - yMin) * plot.height;
+
+    for (double db = yMin; db <= yMax; db += 10) {
+      final y = yOf(db);
+      canvas.drawLine(Offset(plot.left, y), Offset(plot.right, y), gridPaint);
+      _paintText(canvas, "${db.toInt()} dB", Offset(4, y - 7), const TextStyle(fontSize: 10, color: Colors.black54));
+    }
+
+    for (int i = 0; i <= 4; i++) {
+      final f = xMin + (xMax - xMin) * i / 4;
+      final x = xOf(f);
+      canvas.drawLine(Offset(x, plot.top), Offset(x, plot.bottom), gridPaint);
+      _paintText(canvas, f.toStringAsFixed(1), Offset(x - 10, plot.bottom + 6), const TextStyle(fontSize: 10, color: Colors.black54));
+    }
+
+    canvas.drawLine(Offset(plot.left, plot.top), Offset(plot.left, plot.bottom), axisPaint);
+    canvas.drawLine(Offset(plot.left, plot.bottom), Offset(plot.right, plot.bottom), axisPaint);
+
+    _paintText(canvas, "Freq (GHz)", Offset(plot.center.dx - 24, size.height - 18), const TextStyle(fontSize: 11, color: Colors.black87, fontWeight: FontWeight.w500));
+
+    _drawCurve(canvas, freqs, s11, xOf, yOf, Colors.red);
+    _drawCurve(canvas, freqs, s21, xOf, yOf, Colors.blue);
+    _drawCurve(canvas, freqs, s31, xOf, yOf, Colors.purple);
+    _drawCurve(canvas, freqs, s41, xOf, yOf, Colors.green);
+  }
+
+  void _drawCurve(Canvas canvas, List<double> xs, List<double> ys, Function xOf, Function yOf, Color color) {
+    final path = Path();
+    for (int i = 0; i < xs.length; i++) {
+      final x = xOf(xs[i]);
+      final y = yOf(ys[i]);
+      if (i == 0) path.moveTo(x, y); else path.lineTo(x, y);
+    }
+    canvas.drawPath(path, Paint()..color = color..strokeWidth = 2.2..style = PaintingStyle.stroke);
+  }
+
+  void _paintText(Canvas canvas, String text, Offset pos, TextStyle style) {
+    final tp = TextPainter(text: TextSpan(text: text, style: style), textDirection: TextDirection.ltr)..layout();
+    tp.paint(canvas, pos);
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => true;
 }

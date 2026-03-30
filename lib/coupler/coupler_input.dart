@@ -102,7 +102,7 @@ class _ParamEditorState extends State<ParamEditor> {
 
     FocusScope.of(context).unfocus();
     setState(() {
-      _loadFromController();
+      // 不重新加载，保持用户输入
     });
   }
 

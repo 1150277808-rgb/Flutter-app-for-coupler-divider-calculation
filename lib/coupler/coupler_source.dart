@@ -58,6 +58,14 @@ class _SourceMotionState extends State<SourceMotion> with SingleTickerProviderSt
                   ],
                 ),
               ),
+              const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                child: Text(
+                  "Note: Waves may not be visible at very high frequencies.",
+                  style: TextStyle(fontSize: 11, color: Colors.black54, fontStyle: FontStyle.italic),
+                  textAlign: TextAlign.center,
+                ),
+              ),
               const SizedBox(height: 8),
               Expanded(
                 child: AnimatedBuilder(
@@ -190,6 +198,8 @@ class _RingCouplerPainter extends CustomPainter {
     required double phase,
     required Color color,
   }) {
+    if (mag < 0.01) return;
+
     final paint = Paint()
       ..color = color
       ..style = PaintingStyle.stroke
@@ -197,11 +207,12 @@ class _RingCouplerPainter extends CustomPainter {
 
     final dist = (end - start).distance;
     final angle = (end - start).direction;
-    final wavelength = 300.0 / (controller.freqGHz * 10);
+    // 根据频率调整波长，保持视觉合理性
+    final wavelength = 30.0 / (controller.freqGHz / 3.0);
 
     final path = Path();
     for (double t = 0; t <= dist; t += 2) {
-      final y = 8 * mag * sin((t / wavelength) * 2 * pi + phase);
+      final y = 10.0 * max(mag, 0.1) * sin((t / wavelength) * 2 * pi + phase);
       final finalX = start.dx + t * cos(angle) - y * sin(angle);
       final finalY = start.dy + t * sin(angle) + y * cos(angle);
       if (t == 0) {

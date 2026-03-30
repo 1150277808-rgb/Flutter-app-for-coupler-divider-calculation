@@ -145,7 +145,7 @@ class _ResistiveDividerParamEditorState
             const Divider(height: 20),
 
             const Text(
-              "Select Input Port (Simulation):",
+              "Select Input Port (Calculation):",
               style: TextStyle(fontSize: 12),
             ),
             const SizedBox(height: 5),
