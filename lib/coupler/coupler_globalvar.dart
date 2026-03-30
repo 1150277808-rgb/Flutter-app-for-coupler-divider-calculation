@@ -263,6 +263,8 @@ class SourceController extends ChangeNotifier {
     final minusJ = ComplexWave(0.0, -m);
     final plusJ = ComplexWave(0.0, m);
 
+    // Standard Rat-Race (180° Hybrid) S-matrix
+    // Port 1 excitation: outputs at Port 2 and Port 3, Port 4 isolated
     return [
       [z, minusJ, minusJ, z],
       [minusJ, z, z, plusJ],
@@ -318,50 +320,122 @@ class SourceController extends ChangeNotifier {
   }
 
   List<double> sweepS11dB() {
-    return sweepFreqGHz.map((f) {
-      final oldFreq = freqGHz;
+    final oldFreq = freqGHz;
+    final oldExcitations = excitations.map((e) => PortExcitation(
+      enabled: e.enabled,
+      amplitude: e.amplitude,
+      phaseDeg: e.phaseDeg,
+    )).toList();
+
+    for (int i = 0; i < 4; i++) {
+      excitations[i].enabled = (i == 0);
+      excitations[i].amplitude = (i == 0) ? 1.0 : 0.0;
+      excitations[i].phaseDeg = 0.0;
+    }
+
+    final result = sweepFreqGHz.map((f) {
       freqGHz = f;
       calculateAll();
-      final result = 20 * log(b1.magnitude.clamp(1e-6, 1.0)) / ln10;
-      freqGHz = oldFreq;
-      calculateAll();
-      return result;
+      return 20 * log(b1.magnitude.clamp(1e-6, 1.0)) / ln10;
     }).toList();
+
+    freqGHz = oldFreq;
+    for (int i = 0; i < 4; i++) {
+      excitations[i].enabled = oldExcitations[i].enabled;
+      excitations[i].amplitude = oldExcitations[i].amplitude;
+      excitations[i].phaseDeg = oldExcitations[i].phaseDeg;
+    }
+    calculateAll();
+    return result;
   }
 
   List<double> sweepS21dB() {
-    return sweepFreqGHz.map((f) {
-      final oldFreq = freqGHz;
+    final oldFreq = freqGHz;
+    final oldExcitations = excitations.map((e) => PortExcitation(
+      enabled: e.enabled,
+      amplitude: e.amplitude,
+      phaseDeg: e.phaseDeg,
+    )).toList();
+
+    for (int i = 0; i < 4; i++) {
+      excitations[i].enabled = (i == 0);
+      excitations[i].amplitude = (i == 0) ? 1.0 : 0.0;
+      excitations[i].phaseDeg = 0.0;
+    }
+
+    final result = sweepFreqGHz.map((f) {
       freqGHz = f;
       calculateAll();
-      final result = 20 * log(b2.magnitude.clamp(1e-6, 1.0)) / ln10;
-      freqGHz = oldFreq;
-      calculateAll();
-      return result;
+      return 20 * log(b2.magnitude.clamp(1e-6, 1.0)) / ln10;
     }).toList();
+
+    freqGHz = oldFreq;
+    for (int i = 0; i < 4; i++) {
+      excitations[i].enabled = oldExcitations[i].enabled;
+      excitations[i].amplitude = oldExcitations[i].amplitude;
+      excitations[i].phaseDeg = oldExcitations[i].phaseDeg;
+    }
+    calculateAll();
+    return result;
   }
 
   List<double> sweepS31dB() {
-    return sweepFreqGHz.map((f) {
-      final oldFreq = freqGHz;
+    final oldFreq = freqGHz;
+    final oldExcitations = excitations.map((e) => PortExcitation(
+      enabled: e.enabled,
+      amplitude: e.amplitude,
+      phaseDeg: e.phaseDeg,
+    )).toList();
+
+    for (int i = 0; i < 4; i++) {
+      excitations[i].enabled = (i == 0);
+      excitations[i].amplitude = (i == 0) ? 1.0 : 0.0;
+      excitations[i].phaseDeg = 0.0;
+    }
+
+    final result = sweepFreqGHz.map((f) {
       freqGHz = f;
       calculateAll();
-      final result = 20 * log(b3.magnitude.clamp(1e-6, 1.0)) / ln10;
-      freqGHz = oldFreq;
-      calculateAll();
-      return result;
+      return 20 * log(b3.magnitude.clamp(1e-6, 1.0)) / ln10;
     }).toList();
+
+    freqGHz = oldFreq;
+    for (int i = 0; i < 4; i++) {
+      excitations[i].enabled = oldExcitations[i].enabled;
+      excitations[i].amplitude = oldExcitations[i].amplitude;
+      excitations[i].phaseDeg = oldExcitations[i].phaseDeg;
+    }
+    calculateAll();
+    return result;
   }
 
   List<double> sweepS41dB() {
-    return sweepFreqGHz.map((f) {
-      final oldFreq = freqGHz;
+    final oldFreq = freqGHz;
+    final oldExcitations = excitations.map((e) => PortExcitation(
+      enabled: e.enabled,
+      amplitude: e.amplitude,
+      phaseDeg: e.phaseDeg,
+    )).toList();
+
+    for (int i = 0; i < 4; i++) {
+      excitations[i].enabled = (i == 0);
+      excitations[i].amplitude = (i == 0) ? 1.0 : 0.0;
+      excitations[i].phaseDeg = 0.0;
+    }
+
+    final result = sweepFreqGHz.map((f) {
       freqGHz = f;
       calculateAll();
-      final result = 20 * log(b4.magnitude.clamp(1e-6, 1.0)) / ln10;
-      freqGHz = oldFreq;
-      calculateAll();
-      return result;
+      return 20 * log(b4.magnitude.clamp(1e-6, 1.0)) / ln10;
     }).toList();
+
+    freqGHz = oldFreq;
+    for (int i = 0; i < 4; i++) {
+      excitations[i].enabled = oldExcitations[i].enabled;
+      excitations[i].amplitude = oldExcitations[i].amplitude;
+      excitations[i].phaseDeg = oldExcitations[i].phaseDeg;
+    }
+    calculateAll();
+    return result;
   }
 }

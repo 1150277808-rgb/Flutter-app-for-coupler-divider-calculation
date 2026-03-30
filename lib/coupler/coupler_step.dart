@@ -167,29 +167,11 @@ class PolarizationSteps extends StatelessWidget {
                   const Divider(),
                   const SizedBox(height: 8),
                   const Text(
-                    "S-Parameters at Current Frequency:",
+                    "S-Parameters at Current Frequency (Port 1 excitation):",
                     style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
                   ),
                   const SizedBox(height: 8),
-                  Container(
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: Colors.blue.withOpacity(0.05),
-                      borderRadius: BorderRadius.circular(8),
-                      border: Border.all(color: Colors.blue.withOpacity(0.2)),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text("Frequency: ${controller.freqGHz.toStringAsFixed(2)} GHz", style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600)),
-                        const SizedBox(height: 8),
-                        Text("S₁₁ = ${controller.b1.magnitude.toStringAsFixed(4)} ∠ ${controller.getOutputPhaseDeg(1).toStringAsFixed(1)}° = ${(20 * math.log(controller.b1.magnitude.clamp(1e-6, 1.0)) / math.ln10).toStringAsFixed(2)} dB", style: const TextStyle(fontSize: 11)),
-                        Text("S₂₁ = ${controller.b2.magnitude.toStringAsFixed(4)} ∠ ${controller.getOutputPhaseDeg(2).toStringAsFixed(1)}° = ${(20 * math.log(controller.b2.magnitude.clamp(1e-6, 1.0)) / math.ln10).toStringAsFixed(2)} dB", style: const TextStyle(fontSize: 11)),
-                        Text("S₃₁ = ${controller.b3.magnitude.toStringAsFixed(4)} ∠ ${controller.getOutputPhaseDeg(3).toStringAsFixed(1)}° = ${(20 * math.log(controller.b3.magnitude.clamp(1e-6, 1.0)) / math.ln10).toStringAsFixed(2)} dB", style: const TextStyle(fontSize: 11)),
-                        Text("S₄₁ = ${controller.b4.magnitude.toStringAsFixed(4)} ∠ ${controller.getOutputPhaseDeg(4).toStringAsFixed(1)}° = ${(20 * math.log(controller.b4.magnitude.clamp(1e-6, 1.0)) / math.ln10).toStringAsFixed(2)} dB", style: const TextStyle(fontSize: 11)),
-                      ],
-                    ),
-                  ),
+                  _buildStandardSParameters(controller),
                 ],
               ),
             ),
@@ -380,6 +362,61 @@ class PolarizationSteps extends StatelessWidget {
                 style: TextStyle(fontSize: 11, color: Colors.green),
               ),
             ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildStandardSParameters(SourceController controller) {
+    final oldFreq = controller.freqGHz;
+    final oldExcitations = controller.excitations.map((e) => [e.enabled, e.amplitude, e.phaseDeg]).toList();
+
+    for (int i = 0; i < 4; i++) {
+      controller.excitations[i].enabled = (i == 0);
+      controller.excitations[i].amplitude = (i == 0) ? 1.0 : 0.0;
+      controller.excitations[i].phaseDeg = 0.0;
+    }
+    controller.calculateAll();
+
+    final s11Mag = controller.b1.magnitude;
+    final s21Mag = controller.b2.magnitude;
+    final s31Mag = controller.b3.magnitude;
+    final s41Mag = controller.b4.magnitude;
+
+    final s11Phase = controller.getOutputPhaseDeg(1);
+    final s21Phase = controller.getOutputPhaseDeg(2);
+    final s31Phase = controller.getOutputPhaseDeg(3);
+    final s41Phase = controller.getOutputPhaseDeg(4);
+
+    final s11dB = 20 * math.log(s11Mag.clamp(1e-6, 1.0)) / math.ln10;
+    final s21dB = 20 * math.log(s21Mag.clamp(1e-6, 1.0)) / math.ln10;
+    final s31dB = 20 * math.log(s31Mag.clamp(1e-6, 1.0)) / math.ln10;
+    final s41dB = 20 * math.log(s41Mag.clamp(1e-6, 1.0)) / math.ln10;
+
+    controller.freqGHz = oldFreq;
+    for (int i = 0; i < 4; i++) {
+      controller.excitations[i].enabled = oldExcitations[i][0] as bool;
+      controller.excitations[i].amplitude = oldExcitations[i][1] as double;
+      controller.excitations[i].phaseDeg = oldExcitations[i][2] as double;
+    }
+    controller.calculateAll();
+
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Colors.blue.withOpacity(0.05),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: Colors.blue.withOpacity(0.2)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text("Frequency: ${oldFreq.toStringAsFixed(2)} GHz", style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600)),
+          const SizedBox(height: 8),
+          Text("S₁₁ = ${s11Mag.toStringAsFixed(4)} ∠ ${s11Phase.toStringAsFixed(1)}° = ${s11dB.toStringAsFixed(2)} dB", style: const TextStyle(fontSize: 11)),
+          Text("S₂₁ = ${s21Mag.toStringAsFixed(4)} ∠ ${s21Phase.toStringAsFixed(1)}° = ${s21dB.toStringAsFixed(2)} dB", style: const TextStyle(fontSize: 11)),
+          Text("S₃₁ = ${s31Mag.toStringAsFixed(4)} ∠ ${s31Phase.toStringAsFixed(1)}° = ${s31dB.toStringAsFixed(2)} dB", style: const TextStyle(fontSize: 11)),
+          Text("S₄₁ = ${s41Mag.toStringAsFixed(4)} ∠ ${s41Phase.toStringAsFixed(1)}° = ${s41dB.toStringAsFixed(2)} dB", style: const TextStyle(fontSize: 11)),
         ],
       ),
     );

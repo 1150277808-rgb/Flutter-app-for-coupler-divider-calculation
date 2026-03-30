@@ -1,0 +1,1144 @@
+
+
+
+
+
+
+
+
+
+
+
+DEVELOPMENT OF FLUTTER APPS FOR COUPLER/DIVIDER ANALYSIS
+
+
+
+
+
+
+
+
+
+
+ZHANG YI
+SCHOOL OF ELECTRICAL AND ELECTRONIC ENGINEERING 2026
+
+DEVELOPMENT OF FLUTTER APPS FOR COUPLER/DIVIDER ANALYSIS
+
+
+
+
+
+
+ZHANG YI
+
+
+
+
+SCHOOL OF ELECTRICAL AND ELECTRONIC ENGINEERING
+
+A DISSERTATION SUBMITTED IN PARTIAL FULFILMENT OF THE REQUIREMENTS FOR THE DEGREE OF
+MASTER OF SCIENCE IN
+COMMUNICATION ENGINEERING
+
+
+
+
+
+2026
+
+Statement of Originality
+
+
+I hereby certify that the work embodied in this thesis is the result of original research, is free of plagiarised materials, and has not been submitted for a higher degree to any other University or Institution.
+
+
+
+
+
+
+
+31 March 2026
+
+Date	Zhang Yi
+
+Supervisor Declaration Statement
+
+
+I have reviewed the content and presentation style of this thesis and declare it is free of plagiarism and of sufficient grammatical clarity to be examined. To the best of my knowledge, the research and writing are those of the candidate except as acknowledged in the Author Attribution Statement. I confirm that the investigations were conducted in accord with the ethics policies and integrity standards of Nanyang Technological University and that the research data are presented honestly and without prejudice.
+
+
+
+
+
+
+
+
+
+
+31 March 2026
+
+Date	Tan Eng Leong
+
+Authorship Attribution Statement
+
+
+This thesis does not contain any materials from papers published in peer- reviewed journals or from papers accepted at conferences in which I am listed as an author.
+
+
+
+31 March 2026
+
+Date	Zhang Yi
+
+Table of Contents
+Pages
+
+Abstract	i
+
+Acknowledgement List of Figures v List of Tables	vi
+Chapter 1 Introductioniii
+
+
+
+错误!未定义书签。1.1 Research Background11.2 Problem Statement21.3 Research Aim and Objectives31.4 Scope of the Project41.5 Significance of the Study61.6 Thesis Organization7Chapter 2 Literature Review错误!未定义书签。2.1 Introduction 9
+2.2 Microwave Passive Components in RF Systems
+
+92.3 Power Dividers102.4 Directional Couplers122.5 Visualization of S-Parameters and Wave Behavior142.6 Existing Software and Educational Tools162.7 Flutter for Engineering and Educational Application172.8 Research Gap172.9 Chapter Summary18Chapter 3 Theoretical Foundations203.1 Introduction 20
+3.2 Fundamental Theory for Microwave Network Analysis
+203.3 Resistive Divider Theory233.4 Wilkinson Divider Theory243.5 Rat-Race Coupler Theory27
+3.6 Branch-Line Hybrid Theory	29
+3.7 Comparison of the Four Selected Components	31
+3.8 Chapter Summary	32
+Chapter 4 Methodology and System Design	33
+4.1 Introduction 33
+4.2 Project Methodology	34
+4.3 System Requirements Analysis	35
+4.4 Overall System Architecture	36
+4.5 Mathematical Model and Analytical Implementation	38
+4.6 User Interface Design	41
+4.7 Module Design and Functional Description	43
+4.8 Development Tools and Technologies	45
+4.9 Testing and Validation Strategy	46
+4.10 Chapter Summary	47
+Chapter 5 Implementation, Validation and Discussion	49
+5.1 Introduction 49
+5.2 System Implementation	49
+5.3 User Interface Realization	50
+5.4 Graphical Rendering and Visualization Methods	51
+5.5 Implementation of Individual Modules	54
+5.6 Validation Approach	57
+5.7 Validation of Analytical Results	58
+5.8 Functional Testing of the Application	65
+5.9 Discussion	67
+5.10 Chapter Summary	68
+Chapter 6 Conclusions and Future Work	70
+6.1 Introduction 70
+6.2 Summary of the Project	70
+6.3 Achievement of Objectives	71
+6.4 Main Contributions of the Study	72
+6.5 Limitations of the Present Work	72
+6.6 Future Work 73
+6.7 Final Conclusion	74
+References	75
+
+Abstract
+
+This dissertation presents the design and development of a Flutter-based analytical application for selected microwave passive components. The main aim of the project was to provide an accessible and interactive software platform that supports the study of microwave network behavior through theory-based calculation and visualization. The application focuses on four representative components: the Resistive Divider, Wilkinson Divider, Rat-Race Coupler, and Branch-Line Hybrid.
+The project began with a review of the theoretical principles of microwave passive devices and their corresponding analytical models. Based on these models, a modular software architecture was developed using Flutter and Dart to enable cross-platform deployment and a consistent user interface. Each module allows users to enter key parameters and obtain analytical outputs through an interactive interface. The calculation process includes detailed step-by-step derivations showing how frequency-dependent complex S-parameters are obtained and then converted to magnitude in dB form using the standard 20×log?? transformation. In addition to numerical calculation, graphical rendering methods were implemented to display component schematics, frequency-dependent S-parameter plots, and animated signal behaviour.
+The developed system was evaluated through software-level functional testing and analytical verification against expected theoretical results. The results show that the application performs reliably within the scope of ideal microwave analysis. In particular, the Wilkinson Divider and Rat-Race Coupler modules demonstrated outputs consistent with theoretical expectations under different input conditions, while the Resistive Divider and Branch-Line Hybrid modules provided useful reference demonstrations of standard behavior. The interface was designed with consistency across all modules, placing S-parameter plots directly below the parameter input section for easier comparison and analysis.
+Overall, the project demonstrates that modern cross-platform development frameworks can be effectively applied to microwave engineering education and theory-oriented analysis. Although the current system is limited to idealized analytical models and does not replace full-wave simulation or experimental measurement, it provides a practical foundation for future extension as an educational and analytical tool.
+Keywords: microwave passive components, Flutter, analytical application, Wilkinson divider, Rat-Race coupler, Branch-Line hybrid, educational software
+
+Acknowledgement
+
+First and foremost, I would like to express my sincere gratitude to my supervisor, Professor Tan Eng Leong, for his guidance and support throughout this dissertation. From the early development of the topic to the final revision of the written work, his patience, generosity, and academic insight have been invaluable. His supervision has not only helped me complete this project, but has also influenced the way I think, question, and learn.
+I would also like to thank my family for their constant love and support throughout my time in Singapore. Although we were far apart, their care and encouragement were always with me. During moments of uncertainty and fatigue, their trust in me gave me strength and reminded me of the reasons I started this journey. Whatever I have achieved would not have been possible without their unwavering support.
+My sincere thanks also go to my classmates and friends, who made my time abroad more meaningful and memorable. Through study, conversation, shared meals, and time spent together beyond the classroom, they brought warmth, companionship, and joy to my life in Singapore. Their presence enriched my university experience and reminded me that personal growth is shaped not only by hard work, but also by friendship and kindness.
+I would also like to acknowledge my own persistence throughout this period. While completing this final-year project, I was also facing the pressures of the graduate job search. I am grateful that I continued to move forward through both challenges.
+
+Reaching this point, and securing a position that I had sincerely hoped for, is a meaningful reminder that persistence and effort are worthwhile.
+Finally, I would like to express my gratitude for the time I spent in Singapore. This chapter of my life brought challenges, growth, and many unforgettable memories. It will always remain an important and cherished part of my life.
+     Zhang Yi 31 March 2026
+
+List of Figures
+Figure 3.1	22
+错误!未找到引用源。
+List of Tables
+
+错误!未找到引用源。	错误!未定义书签。
+错误!未找到引用源。	错误!未定义书签。
+错误!未找到引用源。	错误!未定义书签。
+错误!未找到引用源。	错误!未定义书签。
+错误!未找到引用源。	错误!未定义书签。
+错误!未找到引用源。	错误!未定义书签。
+错误!未找到引用源。	错误!未定义书签。
+错误!未找到引用源。	错误!未定义书签。
+错误!未找到引用源。	错误!未定义书签。
+错误!未找到引用源。	错误!未定义书签。
+错误!未找到引用源。	错误!未定义书签。
+
+Chapter 1 Introduction
+
+1.1 Research Background
+
+Microwave passive components play an essential role in modern wireless communication systems. Among these components, power dividers and directional couplers are widely used in signal distribution, power combining, impedance matching, antenna feeding networks, balanced circuits, and measurement systems. Their performance directly affects signal transmission quality and the operation of RF and microwave systems. For this reason, a solid understanding of coupler and divider operation is important for students and engineers in the field of wireless communication.
+In RF circuit education, the analysis of couplers and dividers normally involves transmission-line theory, scattering parameters, impedance transformation, and even- odd mode analysis. Although these topics are fundamental, they are often mathematically intensive and may be difficult for students to visualize using only lecture notes or static textbook examples. In many cases, learners can follow the derivation process on paper but still face difficulty connecting the equations to actual circuit behavior and signal flow.
+At the same time, software tools have become increasingly important in engineering learning and design. Numerical tools such as MATLAB and specialized RF software can assist with calculation and verification, but they are not always optimized for
+
+lightweight, interactive, step-by-step educational use on smart devices. Therefore, a mobile or cross-platform application that combines formulas, derivation steps, visualization, and numerical results may offer a more direct and convenient learning approach.
+Flutter is a modern cross-platform development framework that enables the creation of interactive applications with a consistent user interface across different devices. Its widget-based architecture and graphical capabilities make it suitable for educational engineering applications. In this project, Flutter was selected as the development platform to implement an application for the analysis of four representative microwave components: the Resistive Divider, Wilkinson Divider, Rat-Race Coupler, and Branch- Line Hybrid. The calculation procedures and design formulas used in the application are mainly based on the EE6128 RF Circuits in Wireless Communication course, to present the working principles of these components in a clearer and more interactive way.
+1.2 Problem Statement
+
+The study of microwave couplers and dividers often relies on manual derivation and static theoretical explanation. While this approach is academically important, it may not always provide an intuitive understanding of how power is divided, how ports are isolated, or how phase relationships affect output signals. Many students encounter difficulty when attempting to relate theoretical formulas to circuit structure, signal propagation, and final numerical results.
+
+Existing software tools can perform RF-related calculations, but they may present several limitations in an educational context. Some tools focus mainly on professional design rather than conceptual explanation, while others do not provide a clear step-by- step derivation process for beginners. In addition, many solutions are desktop-oriented and are not designed as portable learning tools for quick use on smart devices.
+Another challenge is that different microwave components require different analytical methods. For example, a resistive divider can be described using basic circuit and power relations, whereas a Wilkinson divider involves quarter-wave transformers and isolation resistance, and couplers such as the Rat-Race and Branch-Line Hybrid require even-odd mode analysis and scattering-matrix interpretation. Without a unified platform, students must switch between lecture notes, hand calculations, and multiple software environments, which reduces learning efficiency.
+Therefore, there is a need for an interactive application that integrates theoretical derivation, user-controlled parameter input, graphical visualization, and result calculation within a single platform. Such an application should be portable, easy to use, and suitable for both learning and quick analytical reference. This is the main motivation for the present project.
+1.3 Research Aim and Objectives
+
+The main objective of this project is to develop a Flutter-based application for coupler and divider analysis on smart devices.
+The specific objectives are as follows:
+
+1. To design and implement a cross-platform application using Flutter for the analysis of selected microwave couplers and dividers.
+2. To include four representative components in the application, namely the Resistive Divider, Wilkinson Divider, Rat-Race Coupler, and Branch-Line Hybrid.
+3. To present the analytical procedures of these components in a step-by-step format based on the formulas and concepts taught in EE6128 RF Circuits in Wireless Communication.
+4. To provide interactive input settings and graphical visualization in order to improve user understanding of signal flow, power division, coupling behavior, and port relationships.
+5. To compute and display relevant results such as transmission coefficients, scattering parameters, isolation characteristics, and power distribution.
+6. To verify the correctness of the implemented calculations through comparison with theoretical expectations and reference software tools such as MATLAB or other relevant software, where applicable.
+1.4 Scope of the Project
+
+This project focuses on the development of a Flutter-based analytical application for four microwave passive components: the Resistive Divider, Wilkinson Divider, Rat- Race Coupler, and Branch-Line Hybrid. The work emphasizes formula-based calculation, structured derivation, and educational visualization rather than full-wave
+
+electromagnetic simulation.
+
+The application allows users to enter selected parameters and observe the corresponding analytical results. In the Resistive Divider module, the app demonstrates matching behavior, transmission coefficients, scattering matrix formulation, and power loss characteristics. In the Wilkinson Divider module, the app supports both equal and unequal power division by allowing the user to vary frequency and split ratio. In the Rat-Race Coupler module, the app includes multi-port excitation control, where users can specify amplitude and phase at different ports and obtain the output response based on the scattering-matrix relation, ?? = ????. In the Branch-Line Hybrid module, the app focuses on the standard single-input case and illustrates the ideal center-frequency behavior as well as the response variation with frequency.
+The theoretical formulas implemented in the application are mainly derived from EE6128 course material. The project also includes graphical visualization of circuit structures and animated wave behavior to support conceptual understanding. The developed application is intended for educational and analytical purposes on smart devices.
+The scope of this study does not include hardware fabrication, experimental measurement, or full-wave EM modeling using commercial solvers such as CST, HFSS, or ADS. In addition, although the Branch-Line Hybrid is also suitable for generalized multi-port excitation analysis, that extension is not implemented in the current version and is left for future work.
+
+1.5 Significance of the Study
+
+This study is significant from both educational and technical perspectives.
+
+From an educational perspective, the proposed application provides a more interactive way to study microwave passive components. Instead of relying only on static derivations, users can adjust parameters, observe signal behavior, and follow the calculation process step by step. This can help bridge the gap between mathematical theory and physical interpretation, especially for students learning RF circuit analysis for the first time. The application may also serve as a supplementary learning tool for courses related to microwave engineering and wireless communication, particularly EE6128 RF Circuits in Wireless Communication.
+From a technical perspective, the project demonstrates how Flutter can be used beyond conventional mobile app development to create engineering-oriented calculation tools. The integration of user input, analytical formulas, dynamic visualization, and modular design shows that cross-platform frameworks can support scientific and educational applications effectively. The project therefore provides a practical example of how software can support RF learning and lightweight analytical analysis.
+In addition, the inclusion of four different components in one platform increases the usefulness of the application. Each module highlights different RF concepts, such as resistive loss, impedance transformation, isolation, quadrature phase relationship, and multi-port scattering behavior. As a result, the application is not only a software project, but also a useful learning tool for understanding key coupler and divider principles.
+
+1.6 Thesis Organization
+
+This dissertation is organized into seven chapters.
+
+Chapter 1 introduces the research background, problem statement, objectives, scope, significance, and overall structure of the study.
+Chapter 2 reviews the literature related to microwave passive components, especially power dividers and couplers, as well as scattering parameters, existing software tools, and the use of Flutter in interactive engineering applications.
+Chapter 3 presents the theoretical foundations of the four selected components. It covers transmission-line concepts, power-wave and scattering-parameter analysis, and the specific derivation principles of the Resistive Divider, Wilkinson Divider, Rat- Race Coupler, and Branch-Line Hybrid.
+Chapter 4 describes the system design and methodology of the proposed application, including requirement analysis, development strategy, system architecture, module organization, and validation approach.
+Chapter 5 explains the implementation of the application in Flutter. It presents the main interface design, parameter input mechanism, calculation logic, step-by-step formula display, and graphical visualization for each module.
+Chapter 6 presents the results and discussion of the developed application. The calculated outputs of the four modules are analyzed and compared with theoretical expectations and reference tools where applicable. The strengths and limitations of the application are also discussed.
+
+Chapter 7 concludes the dissertation by summarizing the main contributions and findings of the project, identifying current limitations, and proposing directions for future work.
+
+Chapter 2  Literature Review
+
+2.1 Introduction
+
+This chapter reviews the literature related to microwave passive components and interactive engineering applications that are relevant to the present project. Since the proposed system focuses on RF couplers and dividers, this review first discusses the role of passive microwave components in RF systems. It then examines the theoretical and practical background of power dividers, directional couplers, and scattering parameters. In addition, existing software tools and Flutter-based application development are reviewed to support the design choice of the proposed system.
+The purpose of this chapter is threefold. First, it provides the theoretical background of the selected components, namely the Resistive Divider, Wilkinson Divider, Rat- Race Coupler, and Branch-Line Hybrid. Second, it summarizes previous studies and existing tools related to microwave analysis and learning. Third, it identifies the research gap that motivates the development of a lightweight and interactive Flutter- based analytical application.
+2.2 Microwave Passive Components in RF Systems
+
+Microwave passive components are fundamental elements in RF and wireless communication systems. Unlike active devices, passive components do not provide gain. However, they are essential for signal routing, impedance matching, filtering, coupling, and power distribution. Typical examples include filters, resonators,
+
+matching networks, power dividers, and directional couplers [1], [2].
+
+Among these components, power dividers and couplers are widely used in antenna feed networks, balanced amplifiers, mixers, phased-array systems, and measurement platforms. Their electrical behavior directly affects transmission efficiency, return loss, isolation, and phase response. Therefore, they are important not only in practical engineering design but also in microwave engineering education [3], [4].
+Another reason for their importance is that these circuits provide clear examples of how microwave theory is applied in practice. Through the study of dividers and couplers, learners can understand transmission-line behavior, impedance transformation, and multi-port network analysis in a more concrete way. For this reason, these components are commonly used in textbooks and laboratory teaching as representative microwave structures.
+2.3 Power Dividers
+
+Power dividers are passive networks used to divide an input signal into two or more output signals. Depending on the circuit structure, a power divider may provide equal or unequal power division, and its performance may vary in terms of loss, matching, and isolation. In the present project, two representative divider types are considered: the Resistive Divider and the Wilkinson Divider.
+2.3.1 Resistive Power Divider
+
+The resistive power divider is one of the simplest circuits for signal splitting. Its operation is based on a resistor network, and its topology is relatively easy to analyze.
+
+Due to its simple structure, it is often used as an introductory example in RF circuit study [5].
+One major advantage of the resistive divider is its straightforward implementation. Since it does not rely on quarter-wave transmission lines, it can show relatively broadband behavior in some applications. This makes it useful for basic signal distribution and conceptual explanation. Nevertheless, the main drawback of this structure is its inherent loss. Part of the input power is dissipated in the resistors rather than delivered to the output ports. As a result, even when matching conditions are satisfied, the circuit efficiency is lower than that of lossless transmission-line-based dividers [6].
+Because of this tradeoff, the resistive divider is usually not regarded as the best choice for high-efficiency microwave power distribution. Even so, it remains valuable in education because it allows students to understand the basic ideas of matching, insertion loss, and power division without the additional complexity of transmission- line transformation. For this reason, it is included in the present application as a foundation for later comparison with more advanced divider structures.
+2.3.2 Wilkinson Power Divider
+
+The Wilkinson Power Divider is one of the most important and widely studied microwave dividers. It was originally proposed to achieve equal power division while maintaining matching at all ports and isolation between the output ports [7]. In its conventional two-way form, the structure consists of two quarter-wave transmission-
+
+line branches and one resistor connecting the output ports [8], [9].
+
+The main advantage of the Wilkinson divider is that it can provide low-loss power division under matched conditions. Unlike the resistive divider, it does not dissipate power in the resistor during ideal equal-split operation. Instead, the resistor mainly contributes to output-port isolation when imbalance occurs. This feature gives the Wilkinson divider a strong practical advantage in many RF and microwave systems [10].
+Because of its excellent properties, the Wilkinson divider has been widely discussed in textbooks and design studies. Researchers have also extended the original structure to unequal power division, compact layouts, and broadband operation [11], [12]. These developments show that the Wilkinson divider is not only a classical circuit, but also a continuing topic in microwave design research [13].
+From the educational perspective, the Wilkinson divider is highly suitable for analytical study because it combines several important concepts, including quarter- wave impedance transformation, matching, isolation, and power distribution. Therefore, it is selected as one of the core modules in the proposed Flutter-based application.
+2.4 Directional Couplers
+
+Directional couplers are four-port microwave networks that divide an input signal into different output paths with specific amplitude and phase relations. They are widely used in signal sampling, power combining, balanced circuit design, and measurement
+
+systems. Important performance factors include coupling level, insertion loss, isolation, return loss, and phase difference between output signals.
+2.4.1 Rat-Race Coupler
+
+The Rat-Race Coupler, also known as the hybrid ring coupler, is a four-port microwave circuit with a ring-shaped transmission-line structure. It is commonly used in balanced mixers, modulators, phase-comparison systems, and power-combining circuits [14], [15].
+One important characteristic of the rat-race coupler is that it behaves as a 180? hybrid. Depending on the excited port and the phase relationship of the input signals, the output power can be directed to different ports while one port remains ideally isolated. This property makes the rat-race coupler highly useful in circuits where phase- sensitive signal distribution is required [16].
+The rat-race coupler is commonly analyzed using symmetry, even-odd mode methods, and ideal scattering matrices. These methods make the circuit suitable for both analytical study and software-based implementation. In practical research, many works have focused on compact forms, modified structures, and broadband improvement of the rat-race coupler [17], [18].
+In the present project, the Rat-Race Coupler module is particularly important because it supports multi-port excitation analysis. Instead of limiting the user to a single-input case, the module allows users to specify amplitudes and phases at different ports, which can better demonstrate the physical meaning of the scattering-matrix relation.
+
+2.4.2 Branch-Line Hybrid Coupler
+
+The Branch-Line Hybrid, also called the quadrature hybrid coupler, is another important four-port microwave component. It is typically constructed using four quarter-wave transmission-line sections arranged in a rectangular form. At the center frequency, it can ideally provide equal power division, good matching, output-port isolation, and a 90? phase difference between the two output ports [19], [20].
+Because of these features, the Branch-Line Hybrid is widely used in balanced amplifiers, mixers, phase shifters, and antenna feeding systems. It is also a standard example in microwave engineering courses because its operation can be explained clearly through even-odd mode analysis and network superposition [21].
+Despite its usefulness, the conventional branch-line structure has some limitations. Its performance is frequency-dependent, and the quarter-wave branches may occupy a relatively large physical area. Therefore, many researchers have studied compact, wideband, and modified branch-line couplers for modern microwave applications [22], [23].
+In the current project, the Branch-Line Hybrid module focuses on the standard single- input analytical case. This is sufficient for the educational purpose of demonstrating the ideal center-frequency behavior and the change in output response with frequency. A more generalized multi-input extension can be considered in future work.
+2.5 Visualization of S-Parameters and Wave Behavior
+
+Scattering parameters, or ?? -parameters, are the standard method for describing
+
+microwave networks. At high frequency, direct voltage-current analysis is often less convenient, especially for distributed circuits and multi-port structures. For this reason, microwave networks are commonly represented in terms of incident and reflected waves [24], [25].
+For an ??-port network, the relation between incident waves and outgoing waves can be written as
+?? = ????,
+
+where ?? is the incident wave vector, ?? is the reflected or transmitted wave vector, and ?? is the scattering matrix. Each matrix element ?????? describes the response at port ?? due to an excitation applied at port ?? [26].
+This formulation is especially useful for dividers and couplers because these circuits naturally involve multiple interacting ports. Through the ?? -matrix, reflection, transmission, isolation, and coupling can all be represented in a unified form. For instance, ideal couplers are often introduced through their standard 4 × 4 scattering matrices, while divider performance can be interpreted through matching and transmission coefficients [27].
+Moreover, the ??-parameter framework is highly suitable for software implementation. Once the scattering matrix and excitation vector are known, the output response can be computed directly. This is particularly useful when multiple ports are excited simultaneously with different amplitudes and phases [28]. Therefore, ?? -parameter analysis forms the theoretical basis of the analytical engine used in the proposed application.
+
+2.6 Existing Software and Educational Tools
+
+Many software tools are available for RF and microwave analysis. Professional simulation environments can provide accurate numerical calculation, parameter optimization, and electromagnetic verification. Such tools are valuable in engineering design because they support circuit modeling and practical implementation [29], [30]. However, these platforms are mainly designed for professional use. In many cases, they focus more on simulation results than on theoretical explanation. Although they are powerful, they may not always be convenient for beginners who need to understand the derivation process behind the formulas. In addition, some tools are desktop- oriented and are less suitable for quick and portable use on smart devices [31].
+In engineering education, interactive learning tools and virtual laboratories have been increasingly discussed as useful supplements to textbooks and lecture materials. These tools can improve understanding by allowing users to change parameters and observe the response immediately. This is especially helpful for microwave topics, where abstract concepts such as coupling, matching, and isolation may be difficult to visualize through static notes alone [32].
+Based on this observation, there is still a need for an educationally oriented application that is lightweight, portable, and able to combine formulas, derivation steps, and graphical interaction in one platform. This need provides part of the motivation for the present project.
+
+2.7 Flutter for Engineering and Educational Application
+
+Flutter is a modern cross-platform framework for application development. It allows developers to build mobile, desktop, and web applications from a single code base. Its widget-based structure supports flexible interface design, dynamic state updates, and custom graphical presentation, which are useful in interactive applications [33].
+Recent studies have shown that Flutter has been increasingly used in educational systems and application-oriented development because it offers efficient interface construction and a relatively consistent user experience across different devices [34]. Although many of these works are not specifically focused on microwave engineering, the same technical advantages are highly relevant to engineering tools.
+For an analytical engineering application, several functions are important: user-defined parameter input, real-time output update, modular page design, and intuitive visual presentation. Flutter is suitable for these requirements because it supports responsive UI behavior and structured software organization [35]. Therefore, it is a reasonable platform for building an educational app for coupler and divider analysis.
+2.8 Research Gap
+
+Based on the literature reviewed above, several points can be identified. First, the theory of microwave dividers and couplers is already well established, and many classical as well as improved structures have been reported. Second, scattering- parameter analysis provides a clear and standard framework for multi-port microwave circuits. Third, professional software tools exist, but they are not always designed for
+
+lightweight, derivation-centered learning. Fourth, although Flutter has been applied in educational software development, its use in RF and microwave analytical learning tools remains limited [36].
+Therefore, the research gap does not lie in the absence of microwave theory itself. Instead, the gap lies in the limited availability of an integrated application that combines the following features in a single platform: step-by-step derivation, user- controlled parameter input, analytical calculation, schematic visualization, and portable cross-platform implementation [37].
+The present project addresses this gap by developing a Flutter-based application for four representative microwave passive components: the Resistive Divider, Wilkinson Divider, Rat-Race Coupler, and Branch-Line Hybrid. In particular, the inclusion of multi-port excitation in the Rat-Race Coupler module extends the learning process beyond the basic single-input case and improves the educational value of the system.
+2.9 Chapter Summary
+
+This chapter reviewed the literature related to microwave passive components, especially power dividers, directional couplers, and scattering-parameter analysis. The Resistive Divider, Wilkinson Divider, Rat-Race Coupler, and Branch-Line Hybrid were discussed as representative circuits in RF and microwave engineering. In addition, existing software tools and Flutter-based application development were reviewed from the perspective of interactive learning and lightweight system implementation.
+From the reviewed literature, it can be concluded that although the theoretical
+
+principles of couplers and dividers are already mature, there is still a practical need for an application that presents these principles in a more direct, portable, and interactive way. This finding provides the foundation for the system design and methodology described in the next chapter.
+
+Chapter 3  Theoretical Foundations
+
+
+3.1 Introduction
+
+This chapter presents the theoretical foundations of the microwave components included in the proposed application. Since the project focuses on analytical calculation and interactive visualization, it is necessary to establish the RF principles that govern the operation of dividers and couplers. These principles mainly include transmission-line behavior, scattering parameters, and even-odd mode analysis.
+The chapter first introduces the basic concepts required for microwave network analysis. After that, the operating principles of the Resistive Divider, Wilkinson Divider, Rat-Race Coupler, and Branch-Line Hybrid are discussed. The aim of this chapter is to provide the mathematical and physical basis for the formulas and interactive functions implemented in the Flutter application.
+3.2 Fundamental Theory for Microwave Network Analysis
+
+3.2.1 Transmission-Line Concepts
+
+At microwave frequencies, circuit dimensions are often comparable to the signal wavelength. Under this condition, lumped-element analysis alone is no longer sufficient, and transmission-line theory becomes necessary. In a transmission line, voltage and current vary with position, and reflections may occur when the load
+
+impedance is not equal to the characteristic impedance.
+
+For a transmission line with characteristic impedance ??0 terminated by a load ????, the reflection coefficient is defined as
+???? ? ??0
+Γ =	.
+???? + ??0
+When ???? = ??0 , the line is matched and Γ = 0. In this case, no reflected wave is generated, and maximum power is delivered to the load.
+Another important concept is the quarter-wave transformer. For a lossless transmission-line section of electrical length ??/4, the input impedance is given by
+ ??2
+??in =	,
+??
+
+where ???? is the characteristic impedance of the quarter-wave section. This principle is widely used in microwave matching networks and forms the basis of structures such as the Wilkinson Divider and hybrid couplers [1].
+3.2.2 Scattering Parameters
+
+Scattering parameters, or ?? -parameters, are the standard method for describing microwave networks. At high frequencies, it is more convenient to use incident and reflected waves than voltages and currents, especially for multi-port systems.
+For an ?? -port network, the relation between the incident-wave vector ?? and outgoing-wave vector ?? is
+?? = ????,
+
+where ?? is the scattering matrix. Each element ?????? represents the response at port ?? due to an excitation applied at port ??, while all other ports are terminated in
+
+matched loads [28], [29]. For example, Figure 3.1 illustrates the general representation of an 2-port microwave network, where incident and outgoing signals are related through the scattering matrix.
+The physical meaning of several common terms is as follows:
+
+* ??????: reflection coefficient at port ??
+
+* ??????: transmission or coupling from port ?? to port ??
+
+* ∣ ?????? ∣2: power ratio between output and input under matched conditions
+
+For passive microwave circuits such as dividers and couplers, scattering parameters provide a unified framework for describing matching, transmission, isolation, and coupling behavior.This makes them highly suitable for both theoretical derivation and
+software implementation.
+
+
+Figure 3.1 General representation of an 2-port microwave network
+
+3.2.3 Even-Odd Mode Analysis
+
+Even-odd mode analysis is a useful method for analyzing symmetric microwave circuits. It is commonly applied to couplers and hybrid structures because symmetry allows the network to be decomposed into simpler subproblems.
+
+In the even mode, symmetric ports are excited with equal amplitude and equal phase. In the odd mode, the same ports are excited with equal amplitude but opposite phase. Under these two excitation conditions, the symmetry plane behaves differently, which simplifies the analysis of the network.
+The total response of the original circuit can then be obtained by superposition of the even-mode and odd-mode solutions. This method is particularly useful for the Rat- Race Coupler and the Branch-Line Hybrid, where port isolation and output phase difference are closely related to circuit symmetry [19], [21], [25].
+3.3 Resistive Divider Theory
+
+The Resistive Divider is one of the simplest circuits for RF power division. Unlike transmission-line-based dividers, it uses resistors to distribute the input signal into two output paths. As shown in Fig. 3.2, the resistive divider uses a resistor network to distribute the input signal into two output ports. Because of its simple structure, it is
+suitable for introductory analysis and educational demonstration.
+
+
+Figure 3.2 Circuit structure of a two-way resistive divider
+
+
+The main advantage of the Resistive Divider is its straightforward implementation. It does not require quarter-wave sections, and its topology can be understood using basic circuit theory. In addition, resistive dividers may provide relatively broad frequency behavior compared with narrowband quarter-wave structures.
+However, the main limitation of this divider is its inherent loss. Since power is dissipated in the resistors, the circuit cannot achieve ideal lossless power division. Even when matching is achieved, part of the input power is converted into heat rather than delivered to the output ports [13], [14].
+For educational purposes, the Resistive Divider is important because it demonstrates the tradeoff between simplicity and efficiency. In the application developed in this project, it serves as the most basic module for illustrating matching behavior, insertion loss, and power splitting.
+3.4 Wilkinson Divider Theory
+
+The Wilkinson Divider is a classical microwave power divider designed to provide equal power division, good input matching, and high isolation between output ports. Compared with the Resistive Divider, it is much more efficient because it is ideally lossless under matched operating conditions [12].
+3.4.1 Basic Structure
+
+A conventional two-way Wilkinson Divider consists of:
+
+* one input port,
+
+* two output ports,
+
+* two quarter-wave transmission-line branches,
+
+* one resistor connected between the output ports.
+
+For a system impedance ??0 , the equal-split Wilkinson Divider uses branch impedances of
+????/4 = √2??0
+
+and an isolation resistor of
+
+?? = 2??0.
+
+For a 50 Ω system, these values become
+
+????/4 = 70.7 Ω, ?? = 100 Ω.
+Figure 3.3 shows the conventional Wilkinson Divider, which consists of two quarter- wave branches and an isolation resistor connected between the output ports.
+
+Figure 3.3.2 Conventional Wilkinson power divider
+
+3.4.2 Operating Principle
+
+When power is applied to the input port, the two quarter-wave branches divide the signal equally between the output ports. Under ideal matched conditions, the output signals have equal amplitude and phase. Therefore, no current flows through the
+
+resistor, and no power is dissipated in it [1], [12].
+
+The resistor mainly becomes active when there is imbalance, mismatch, or unequal excitation between the output ports. In such cases, it absorbs the differential component and improves isolation between the output ports.
+The ideal scattering matrix of the equal-split Wilkinson Divider can be expressed as
+
+
+
+
+
+This matrix indicates that:
+
+* the input port is matched,
+
+
+?? =
+
+???
+
+
+√2
+
+0	1	1
+[1	0	0].
+1	0	0
+
+
+* equal transmission occurs from port 1 to ports 2 and 3,
+
+* ports 2 and 3 are ideally isolated from each other.
+
+3.4.3 Unequal Wilkinson Divider
+
+In practical design, equal power division is not always sufficient. Some systems require unequal output power levels. For this reason, many studies have extended the Wilkinson structure to unequal power division [15]–[18].
+In an unequal Wilkinson Divider, the characteristic impedances of the two quarter- wave branches are no longer identical, and the resistor value is also adjusted according to the required power ratio. Although the detailed formulas depend on the design ratio, the basic design goal remains the same: matched operation at the input, specified power split at the outputs, and good isolation between output ports.
+In the present project, both equal and unequal split cases are included so that users can observe how the split ratio changes the transmission coefficients and output amplitudes.
+
+3.5 Rat-Race Coupler Theory
+
+The Rat-Race Coupler, also known as the hybrid ring coupler, is a four-port microwave network used for power division, signal combining, and phase-sensitive applications. Its ring-shaped structure distinguishes it from other couplers and makes it a typical example of a 180? hybrid [19], [20].
+3.5.1 Basic Structure and Characteristics
+
+The conventional Rat-Race Coupler is formed by a transmission-line ring with a total electrical length of 3??/2. The four ports are placed around the ring at specific intervals so that the signal experiences different path lengths depending on the direction of propagation.
+Its main characteristics include:
+
+* four-port operation,
+
+* one isolated port under ideal excitation,
+
+* equal power division in standard operation,
+
+* phase-dependent output behavior.
+
+As illustrated in Fig. 3.4, the rat-race coupler is formed by a ring-shaped transmission- line structure with four ports positioned around the ring. Because of these properties, the Rat-Race Coupler is widely used in mixers, balanced amplifiers, modulators, and sum-and-difference circuits.
+
+
+
+
+Figure 3.4 Rat-race coupler layout with port numbering
+
+
+
+3.5.2 Even-Odd Mode Interpretation
+
+The operation of the Rat-Race Coupler can be explained clearly using even-odd mode analysis. Due to the symmetry of the ring structure, the response of the circuit can be decomposed into even-mode and odd-mode components. This makes it possible to explain why one port becomes isolated and why the output signals may have either equal phase or opposite phase under different excitation conditions [19], [21].
+Under ideal conditions, the coupler can also be represented by a scattering matrix. This allows the output response to be calculated directly from
+?? = ????.
+
+This expression is especially useful in the present project because the Rat-Race Coupler module supports multi-port excitation. Once the user specifies the input amplitudes and phases at different ports, the outgoing waves can be computed directly
+
+by matrix multiplication [23], [24], [28].
+
+3.5.3 Educational Relevance
+
+Compared with simpler circuits, the Rat-Race Coupler provides a richer demonstration of phase behavior in multi-port networks. It helps users understand how signal paths, interference, and phase relationships determine the final output distribution. For this reason, it is one of the most important modules in the proposed application.
+3.6 Branch-Line Hybrid Theory
+
+The Branch-Line Hybrid, also called the quadrature hybrid coupler, is another four- port microwave circuit. Unlike the Rat-Race Coupler, which behaves as a 180? hybrid, the Branch-Line Hybrid ideally produces a 90? phase difference between its output ports [25], [26].
+3.6.1 Basic Structure
+
+The conventional Branch-Line Hybrid is composed of four quarter-wave transmission- line sections arranged in a rectangular form. At the design frequency, the characteristic impedances of these branches are selected so that the input signal is split equally into two output ports, while the fourth port remains isolated.
+Under ideal center-frequency conditions, the Branch-Line Hybrid provides:
+
+* equal power division,
+
+* good input matching,
+
+* one isolated port,
+
+* a 90? phase difference between the outputs.
+
+Figure 3.6 shows the conventional branch-line hybrid, in which four quarter-wave transmission-line sections form a four-port quadrature coupler. These properties make it useful in balanced amplifiers, mixers, and phase-sensitive RF systems [1], [25].
+Figure 3.5 Branch-line hybrid coupler structure with port numbering
+
+3.6.2 Scattering Representation
+
+Like other multi-port microwave networks, the Branch-Line Hybrid can be described by an ideal ??-matrix. This representation shows the transmission relationship between ports and clearly indicates the quadrature phase relationship between the two outputs. Its performance, however, depends strongly on frequency because the circuit is based on quarter-wave transmission lines. Therefore, the ideal response occurs mainly near the design frequency, and the output balance degrades when the operating frequency moves away from that point [26], [27].
+3.6.3 Role in the Present Application
+
+In this project, the Branch-Line Hybrid module focuses on the standard single-input
+
+case. This is sufficient for demonstrating the core features of the circuit, including equal split, isolated-port behavior, and quadrature phase output. Although a generalized multi-input version is also possible in theory, it is reserved for future work.
+3.7 Comparison of the Four Selected Components
+
+The four microwave components selected in this project represent different theoretical and educational characteristics.
+* The Resistive Divider is the simplest and easiest to understand, but it is inherently lossy.
+* The Wilkinson Divider provides efficient power division with matching and output isolation at the design frequency.
+* The Rat-Race Coupler demonstrates strong phase-dependent behavior and is suitable for multi-port excitation analysis.
+* The Branch-Line Hybrid provides quadrature outputs and illustrates the operation of a 90? hybrid.
+Together, these four circuits cover several important microwave concepts:
+
+* impedance matching,
+
+* insertion loss,
+
+* output isolation,
+
+* quarter-wave transformation,
+
+* phase control,
+
+* even-odd mode analysis,
+
+* scattering-matrix formulation.
+
+For this reason, they form an appropriate theoretical foundation for the proposed application.
+3.8 Chapter Summary
+
+This chapter presented the theoretical foundations required for the analysis of the four microwave components included in the proposed application. Transmission-line concepts, scattering parameters, and even-odd mode analysis were introduced as the main analytical tools. Based on these principles, the operation of the Resistive Divider, Wilkinson Divider, Rat-Race Coupler, and Branch-Line Hybrid was explained.
+The discussion in this chapter provides the mathematical basis for the formulas, calculations, and visualizations implemented in the system. With this theoretical background established, the next chapter will describe the methodology and system design of the proposed Flutter-based analytical application.
+
+Chapter 4
+Methodology and System Design
+
+4.1 Introduction
+
+This chapter presents the methodology and system design of the proposed Flutter- based analytical application for microwave passive components. While the previous chapter established the theoretical principles of the selected circuits, the present chapter explains how those principles were translated into a usable software system. The chapter therefore focuses on the development approach, system requirements, software architecture, analytical implementation, interface design, and validation strategy.
+The aim of the project was not merely to display theoretical formulas, but to build an interactive platform through which users can enter parameters, perform calculations, and observe the corresponding output behavior of several representative microwave components. For this reason, the methodology of the work combines theoretical modelling with software development. The result is a cross-platform educational application that connects microwave network theory with practical computation and visualization.
+This chapter is organized as follows. First, the general project methodology is introduced. Next, the functional and non-functional requirements of the system are described. The overall architecture of the application is then presented, followed by
+
+the analytical models used for each module. After that, the design of the user interface and the functions of the individual component modules are explained. Finally, the development tools and the testing strategy are discussed in order to show how the correctness and usability of the system were evaluated.
+4.2 Project Methodology
+
+The present study adopts a design-and-development methodology. This approach is appropriate because the project is centered on the creation of a functional engineering application rather than on purely experimental measurement or statistical investigation. The work began with a review of microwave component theory and existing educational or analytical tools, as discussed in Chapter 2. Based on that review, a set of target components and system objectives was defined. The application was then designed and implemented as a structured software solution using Flutter.
+The development process followed a sequence of closely related stages. First, the theoretical behavior of the selected microwave components was identified and simplified into analytical forms suitable for computation. Second, the required software functions were determined from both an engineering and an educational perspective. Third, the application architecture was designed so that user input, analytical computation, and graphical presentation could be integrated into a single framework. Fourth, the system was implemented module by module, with each component page corresponding to one microwave structure. Finally, the correctness of the calculations and the responsiveness of the interface were checked through
+
+functional testing and comparison with theoretical expectations.
+
+This methodology was chosen for two main reasons. The first reason is that the project requires a clear relationship between theory and implementation. Unlike a purely descriptive educational tool, the application must compute real outputs based on user- defined values. The second reason is that usability is an important part of the system objective. The application is intended not only to produce results, but also to support learning through clarity, interactivity, and portability. Therefore, the methodology combines analytical modelling, interface design, software implementation, and validation in a unified development process.
+4.3 System Requirements Analysis
+
+The design of the application was guided by both functional and non-functional requirements. Functional requirements describe what the system must do, whereas non-functional requirements define how the system should perform and how it should be experienced by the user.
+From a functional perspective, the application was required to support four microwave component modules: the Resistive Divider, Wilkinson Divider, Rat-Race Coupler, and Branch-Line Hybrid. For each module, the user should be able to enter circuit or excitation parameters, execute the analytical calculation, and observe the resulting output values. Depending on the module, these outputs may include transmission coefficients, phase relationships, insertion behavior, and wave-related responses. Since the Rat-Race Coupler is more strongly related to multi-port excitation, the system also
+
+needed to allow the user to define multiple input amplitudes and phases in that module. Another important requirement was the presentation of results in a form that is suitable for learning. This means that the application should not only output numerical values, but should also organize the results in a way that helps the user understand the relation between input conditions and circuit behavior. For this reason, the system was designed to combine formulas, calculation results, and visual interpretation within one environment.
+From a non-functional perspective, the application was expected to be lightweight, responsive, and easy to use. The interface should remain clear even when the user is not already familiar with all microwave concepts. Cross-platform capability was also important, since one of the motivations for selecting Flutter was the possibility of deploying the same application structure across different devices. In addition, the system should maintain fast response during parameter updates, because delayed interaction would reduce its educational value.
+Overall, the requirements analysis showed that the application should function as an analytical learning tool rather than as a full-scale simulation platform. This distinction influenced all later design decisions, including the choice of analytical formulas, the modular software architecture, and the simplified but educationally meaningful style of visualization.
+4.4 Overall System Architecture
+
+The application was designed using a modular architecture in which each microwave
+
+component is implemented as an independent analytical page within a unified software framework. Although the four modules represent different circuit structures, they follow the same general workflow. First, the user selects a module. Second, the user enters the required parameters. Third, the system processes these parameters and executes the corresponding analytical calculation. Finally, the results are displayed numerically and visually. The overall architecture of the proposed application is
+illustrated in Fig. 4.1.
+
+Figure 4.1 Overall system architecture
+
+From a structural point of view, the system can be divided into three main layers: the input layer, the analytical layer, and the presentation layer. The input layer is responsible for user interaction, including text fields, parameter selectors, and control elements. The analytical layer contains the mathematical logic for each circuit module. This layer performs calculations based on the formulas and ideal models introduced in Chapter 3. The presentation layer is responsible for displaying outputs, including
+
+calculated values, explanatory text, and visual results.
+
+This architecture was chosen because it provides a clear separation between user interaction and computational logic. Such separation improves software maintainability and also makes it easier to expand the application in the future. For example, a new microwave component can be added by developing a new analytical module while preserving the same overall interface structure.
+In practical operation, the data flow begins with parameter input from the user. From the user input, the application applies the corresponding analytical formulas and generates the output data. The results are then passed to the presentation layer, where they are displayed in a readable and interactive form. This process allows the system to provide immediate feedback when the user changes a parameter, which is one of the key educational strengths of the application.
+4.5 Mathematical Model and Analytical Implementation
+
+The core function of the application lies in its analytical engine. Instead of relying on full-wave electromagnetic simulation, the system uses idealized theoretical models and formula-based calculations. This choice is consistent with the educational purpose of the project, since the goal is to help users understand microwave behavior through direct relationships between parameters and outputs.
+The mathematical implementation of the system is based on the theories presented in Chapter 3. For divider modules, the calculations focus on matching behavior, transmission characteristics, and power distribution. For coupler modules, the
+
+calculations focus more strongly on multi-port wave relationships, phase behavior, and ideal scattering matrices. Although the formulas differ across modules, they all follow the same computational principle: user-defined inputs are converted into analytical outputs through deterministic mathematical relationships.
+4.5.1 Resistive Divider Model
+
+The Resistive Divider module was designed as the most basic analytical case in the application. Its implementation focuses on the relation between resistance values, matching behavior, and loss. Since resistive dividers are inherently lossy, the module emphasizes the fact that power splitting can be achieved at the cost of efficiency.
+In software terms, the module accepts the relevant circuit parameters and applies the corresponding network relations to determine output transmission behavior. The S-parameters of the symmetric three-port resistive divider are computed analytically from the resistance value R and reference impedance Z?. The calculation process follows two clear steps. First, the S-parameter values are obtained directly from the circuit relations: S?? = (1+2g)/3 and S?? = S?? = (1-g)/3, where g = (R-Z?)/(R+Z?) is a normalized parameter derived from the resistance ratio. Second, the magnitude of each S-parameter is converted to decibel form using 20×log??(|S|). This step-by-step presentation allows users to follow the calculation from circuit parameters to final dB values without skipping any intermediate stage.
+The module also includes a frequency-dependent S-parameter plot showing S??, S??, and S??. Since the resistive divider's S-parameters are determined purely by resistance ratios rather than by transmission-line length, the response is frequency-independent and the plot shows flat horizontal lines. This is an important educational point, as it clearly distinguishes the resistive divider from quarter-wave structures such as the Wilkinson Divider. The plot is placed directly below the parameter input section, consistent with the layout adopted across all other modules in the application.
+This module serves as an introductory analytical model and provides a conceptual starting point for users before they move on to more advanced structures such as the Wilkinson Divider.
+4.5.2 Wilkinson Divider Model
+
+The Wilkinson Divider module was implemented using the standard analytical principles of quarter-wave impedance transformation and output-port isolation. For the equal-split case, the application uses the conventional design relations in which the branch impedance is √2Z? and the isolation resistor is 2Z?. The output response is then determined from the ideal matched condition and power division behavior.
+For the unequal-split case, the application extends the model so that users can define a desired split ratio. Based on this ratio, the module computes the corresponding output relationship and presents the resulting transmission characteristics. This feature was included because unequal division has practical significance and also increases the educational value of the module.
+One important feature of this module is the detailed presentation of S-parameter calculation. The module shows the complete analytical process in two clear steps. First, the frequency is substituted into the S-parameter formulas to obtain the complex values, including both magnitude and phase information. The electrical length θ is calculated as θ(f) = (π/2)(f/f?), and this value is then used in the S-parameter expressions such as S??(f) = -j√(1/(1+K?))sin(θ(f)). Second, the magnitude of each complex S-parameter is converted to decibel form using the standard transformation 20×log??(|S|). This two-step presentation helps users understand how theoretical formulas lead to the final dB values commonly used in RF engineering.
+The module also includes a frequency-dependent S-parameter plot that displays S??, S??, S??, and S?? across a frequency range. The frequency sweep is dynamically adjusted based on the user-defined center frequency, typically covering 0.5f to 1.5f. This allows users to observe how the divider performance changes with frequency and to identify the center frequency where optimal matching and division occur. By comparing equal and unequal cases through both numerical outputs and graphical plots, users can better understand how design objectives influence circuit parameters and output response.
+4.5.3 Rat-Race Coupler Model
+
+The Rat-Race Coupler module is the most interactive analytical module in the system. Its implementation is based on the scattering-matrix relation
+?? = ????,
+
+where ?? is the user-defined excitation vector and ?? is the resulting output-wave vector. This formulation makes it possible to support simultaneous excitation at multiple ports, which is one of the distinctive features of this project.
+In the software design, the user may directly select and configure input ports without needing to click preset buttons first. Users can check or uncheck any combination of ports and specify the amplitude and phase for each selected port. These values are converted into complex wave quantities, and the ideal S-matrix of the rat-race coupler is then applied to calculate the outgoing waves. The results are expressed in terms of output amplitudes and relative phases, and are displayed in both complex form (magnitude ∠ phase) and decibel form.
+The module presents the S-parameter calculation results clearly in the analysis steps. For each port, the output shows the format "S?? = [magnitude] ∠ [phase]° = [dB value] dB", where the dB value is obtained by applying 20×log?? to the magnitude. This presentation format helps users see the direct connection between complex S-parameters and their logarithmic representation.
+Similar to the Wilkinson module, the Rat-Race Coupler also includes a frequency-dependent S-parameter plot positioned below the parameter input section. This plot shows how S??, S??, S??, and S?? vary across frequency, allowing users to observe the coupler's frequency response characteristics. Through this method, the module allows users to explore not only the standard single-input case, but also more advanced multi-input conditions. This makes the Rat-Race Coupler module particularly valuable from an educational point of view.
+
+4.5.4 Branch-Line Hybrid Model
+
+The Branch-Line Hybrid module was implemented using the ideal center-frequency behavior of a quadrature hybrid. The main purpose of this module is to demonstrate equal power division, isolated-port behavior, and the 90? phase difference between the two output ports.
+In the present version of the application, the analysis is limited to the standard single- input case. This simplification was adopted in order to preserve clarity and reduce unnecessary interface complexity. Within this scope, the module computes the expected output relationship under ideal conditions and presents the results in a way that highlights the quadrature nature of the circuit. Although a more generalized excitation model is theoretically possible, the current implementation is sufficient for the educational objectives of the project.
+4.6 User Interface Design
+
+The user interface was designed with simplicity and clarity as the main priorities. Since the application is intended for analytical learning rather than professional simulation, the interface needed to support quick understanding and low interaction complexity. For this reason, each module follows a similar layout structure, allowing users to move from one component page to another without having to learn a completely new interface pattern. The main module selection interface is shown in Fig. 4.3.
+
+
+
+
+Figure 4.2 Main module selection interface
+
+The general interface flow begins with a main navigation page from which users can select one of the four microwave modules. After entering a module, the user is presented with a parameter input area at the top, followed by a frequency-dependent S-parameter plot, and then a step-by-step calculation section below. This consistent arrangement is applied across all four modules, so that users always know where to find the input controls, graphical results, and analytical derivation steps. Placing the S-parameter plot directly below the input section also makes it easier to observe how the plot updates when parameters are changed.
+A further design goal was to ensure that formulas and outputs remain visually connected. In the present application, the interface was designed to reduce the gap between parameter input and result interpretation by placing the theoretical derivation steps within the same scrollable page. Each module shows the calculation process in a structured way: the frequency or circuit parameters are first substituted into the S-parameter formulas to produce complex values, and these values are then converted to dB using 20×log??(|S|). This arrangement encourages users to associate mathematical expressions with circuit behavior rather than treating the calculation as a black box.
+Responsiveness was also an important consideration. Since the application was developed in Flutter, the interface can update efficiently when the user changes parameter values. This dynamic behavior strengthens the interactive character of the application and supports immediate observation of analytical changes. In the Rat-Race Coupler module, particular attention was paid to the port selection interface, which was designed to allow users to directly check or uncheck any input port and enter amplitude and phase values freely, without depending on preset configuration buttons.
+
+4.7 Module Design and Functional Description
+
+Although all four modules share a common architectural pattern, each one was designed to emphasize a different microwave concept. The Resistive Divider module focuses on basic power splitting and inherent loss. Its main role is to provide a simple analytical introduction that allows users to understand the tradeoff between circuit simplicity and efficiency. The module displays the analytical S-parameters, a flat-response frequency plot, and a step-by-step derivation that includes the dB conversion process.
+
+Figure 4.4.1 Resistive power divider page
+
+The Wilkinson Divider module extends this learning process by introducing quarter-wave transformation and output-port isolation. In this module, the user can compare equal-split and unequal-split cases, which makes the module more flexible than a purely textbook-style example. The frequency-dependent S-parameter plot in this module shows how performance changes across a frequency range centered on the user-defined operating frequency. The step-by-step derivation clearly shows the substitution of frequency into the S-parameter expressions, followed by the magnitude-to-dB conversion.
+
+
+Figure 4.4.2 Wilkinson power divider page
+
+The Rat-Race Coupler module was designed as the most advanced feature of the application. Its distinguishing function is the multi-port excitation interface, which allows users to directly select any combination of input ports and freely set the amplitude and phase for each. This design removes the restriction of requiring preset configurations, giving users more analytical flexibility. The step-by-step output section shows the computed S-parameter results for the current excitation, including both the complex form and the corresponding dB values. The frequency-dependent plot further helps users understand the coupler's broadband behavior.
+
+Figure 4.4 Rat-race coupler page
+
+The Branch-Line Hybrid module provides a focused treatment of quadrature coupling. Its design emphasizes the standard single-input case and illustrates how equal split and a 90° phase difference appear in a four-port microwave network. A frequency-dependent S-parameter plot is also included in this module, showing how the four S-parameters vary with frequency and providing a visual reference for the coupler's operating bandwidth. Although this module is analytically simpler than the multi-input Rat-Race Coupler, it remains important because it completes the set of representative circuits included in the application.
+
+
+Figure 4.5 Branch line hybrid page
+
+Taken together, these four modules were designed not merely as separate calculators, but as a structured learning sequence. Users can begin with the simpler divider models and then move toward more complex coupler behavior. The consistent placement of S-parameter plots and step-by-step derivations across all modules means that users can compare different microwave structures within a familiar interface structure, which supports both conceptual learning and analytical understanding.
+4.8 Development Tools and Technologies
+
+The application was developed using Flutter as the main framework and Dart as the programming language. Flutter was selected because it supports cross-platform application development with a single code base and provides strong support for interactive user interfaces. These characteristics are well suited to an engineering
+
+application in which parameter updates and result displays must occur smoothly and consistently.
+The application was developed using Flutter and Dart in Visual Studio Code, while Chrome was used for emulator-based testing and debugging.. During development, Flutter’s widget-based design made it possible to organize the application into reusable interface components. This improved both development efficiency and structural consistency across modules.
+From the analytical perspective, the mathematical logic was implemented directly in Dart functions. This approach was appropriate because the project relies on closed- form analytical relationships and idealized matrix calculations rather than on heavy numerical simulation. As a result, the application remains lightweight while still providing meaningful microwave analysis. The use of a direct analytical implementation also makes the system easier to understand and maintain, which is important for future extension.
+4.9 Testing and Validation Strategy
+
+Testing and validation were necessary to ensure that the application produced theoretically correct outputs and maintained reliable user interaction. Since the system is an analytical educational tool, validation was based primarily on consistency with theoretical expectations rather than on full electromagnetic measurement.
+The first part of the validation process involved checking the calculation results against known analytical behavior. For example, the Wilkinson Divider module was expected
+
+to show equal output transmission in the equal-split case and modified transmission levels in the unequal-split case. The Rat-Race Coupler and Branch-Line Hybrid modules were checked to confirm that their output phase relations and isolated-port behavior matched ideal theoretical predictions. In addition, selected outputs were compared manually with the equations and relationships discussed in Chapter 3.
+The second part of the validation process focused on functional testing of the software itself. This included testing parameter entry, response to invalid inputs, consistency of navigation between modules, and stability of result updates after repeated user interaction. Since the application was intended to be interactive, responsiveness was also an important aspect of testing. A correct analytical engine would still provide poor educational value if the interface behaved inconsistently or failed to update clearly.
+Overall, the testing strategy aimed to verify both correctness and usability. Correctness ensured that the analytical results were meaningful, while usability ensured that the system could effectively serve its intended educational purpose.
+4.10 Chapter Summary
+
+This chapter described the methodology and system design of the proposed Flutter- based application for microwave passive component analysis. A design-and- development approach was adopted, beginning with theoretical study and requirement analysis, followed by system planning, implementation, and validation. The chapter also explained the system architecture, the analytical models used in each module, the interface design principles, and the development tools employed in the project.
+
+In addition, the chapter outlined the validation strategy used to examine the correctness and functionality of the application. Through this methodology, the project was able to transform established microwave theory into a lightweight and interactive analytical platform. The next chapter will present the implementation results, system testing, and discussion of the developed application.
+
+Chapter 5
+Implementation, Validation and Discussion
+5.1 Introduction
+
+This chapter presents the implementation and evaluation of the developed microwave component analytical application. It describes the realized system functions, user interface design, graphical rendering methods, and module-level analytical behavior for the implemented components. In addition, the chapter includes validation and functional testing to assess whether the application outputs are consistent with the intended theoretical models. Through these discussions, the chapter demonstrates how the developed Flutter-based system integrates analytical computation with interactive visualization for educational microwave analysis.
+5.2 System Implementation
+
+The proposed application was successfully implemented using Flutter and Dart, following the design framework described in Chapter 4. The completed system provides a unified software environment in which users can select a microwave component, enter relevant analytical conditions, and observe the corresponding output response. In this way, the implementation supports the main objective of the project, which is to connect microwave network theory with accessible and interactive software-based analysis.
+From a structural point of view, the application was developed in a modular form. Each microwave component is represented by a dedicated page with its own input configuration, analytical logic, and output display. At the same time, a consistent overall interaction pattern is maintained throughout the application so that users can move between modules without having to adapt to an entirely different interface structure each time.
+The realized system does not aim to replace professional electromagnetic design platforms. Instead, it focuses on formula-based analysis and conceptual clarity. For this reason, the application emphasizes immediate result generation, direct presentation of analytical outputs, and simplified visualization of microwave component behavior. This implementation approach remains consistent with the academic and educational scope of the present project.
+5.3 User Interface Realization
+
+The realized user interface follows the design principles introduced in Chapter 4. The main page of the application allows the user to select one of the available microwave component modules and serves as the entry point to the analytical workflow. This interface establishes the overall layout and interaction style of the system. The main application interface is shown in Figure 4.2.
+After selecting a module, the user is directed to a dedicated analysis page. Each module page contains the key elements required for interactive analysis, including a parameter input section, a frequency-dependent S-parameter plot positioned directly below the input area, and a step-by-step calculation section. This organization allows the user to move naturally from defining analytical conditions to interpreting the corresponding outputs.
+One important design feature is the consistent placement of the S-parameter plots across all modules. In the current implementation, the plot appears immediately below the parameter input section in all four modules: Wilkinson Divider, Branch-Line Hybrid, Resistive Divider, and Rat-Race Coupler. This uniform layout makes it easier for users to observe how changes in input parameters affect the frequency response, and it also reduces the learning effort required when moving from one module to another.
+The step-by-step calculation sections are designed to show the complete analytical process in a transparent way. For each module, the calculation is presented in two main stages. First, the user-defined frequency or circuit parameters are substituted into the S-parameter formulas to obtain complex values, including both magnitude and phase information. Second, the magnitude of each S-parameter is converted to decibel form using the standard transformation 20×log??(|S|). This two-stage presentation helps users understand how theoretical formulas lead to the final numerical results commonly used in RF engineering.
+The realized interface demonstrates the practical suitability of Flutter for this type of engineering-oriented educational application. Although the specific analytical content differs across modules, the interface remains visually consistent and easy to follow. This is especially important in a learning-based tool, since it allows users to compare different microwave structures within a common software environment.
+5.4 Graphical Rendering and Visualization Methods
+
+The graphical schematics in the developed application were not inserted as static images. Instead, they were rendered programmatically in Flutter so that the displayed structures, wave motion, and port states could remain synchronized with the analytical results of each module. This approach was important because the application was intended not only to present numerical outputs, but also to provide an intuitive visual interpretation of microwave signal flow.
+In implementation terms, the rendering process combines Flutter widget-based state control with custom drawing. The schematic display of each module was built using CustomPaint and CustomPainter, while dynamic motion was driven by an AnimationController embedded in a StatefulWidget. In several modules, including the Resistive Divider, Rat-Race Coupler, and Branch-Line Hybrid, the repainting process was managed through AnimatedBuilder, allowing the displayed waveforms to update continuously during animation and also to respond to changes in controller values. This design enabled the application to redraw the microwave structures in real time without relying on pre-generated graphical assets.
+For the Wilkinson Divider module, the characteristic divider geometry was generated directly from drawing paths. The input transmission line was represented by a straight path, while the two output branches were formed using Path together with quadraticBezierTo(...), producing the curved upper and lower arms of the divider. The branch widths were also adjusted according to calculated impedance-related parameters, so that the visual structure reflected the analytical state of the model. The isolation resistor and output loads were drawn separately using line segments and zigzag resistor symbols, and the travelling waves were generated by tracing sinusoidal offsets along the corresponding paths.
+For the Rat-Race Coupler module, the hybrid ring was rendered geometrically using drawCircle(...), while the four ports were positioned by calculating points around the ring from predefined angular locations. Straight connection lines were then drawn outward from the ring to form the port arms. The travelling-wave display was produced programmatically by sampling a sinusoidal function along the propagation direction between two points. For a distance parameter t, the displayed transverse displacement follows a sinusoidal form,
+2????
+??(??) = ??sin ( ?? +??),
+
+where ?? is the displayed wave magnitude, ?? is the phase, and ?? is a visualization
+
+wavelength determined from the selected operating frequency. By rotating this sinusoidal displacement into the local port direction, the application was able to show animated input and output waves that respond directly to user-defined amplitude and phase settings.
+A similar drawing strategy was applied to the other modules. In the Resistive Divider module, the Y-shaped three-port structure was constructed from a central node and three arms placed at fixed angular positions, with resistor sections represented by zigzag paths inserted into each arm. In the Branch-Line Hybrid module, the rectangular four-port structure was created from orthogonal line segments, while the quarter-wave line labels and the through, coupled, and isolated responses were added as text and animated waveform overlays. These module-specific drawings were therefore all produced from a common programmatic visualization principle rather than from fixed schematic images.
+Color coding was used consistently to improve readability. Excited input waves were shown in red, outgoing waves were shown in blue, and near-zero or isolated responses were shown in grey. Port markers, labels, and waveform visibility were also updated according to the current excitation state and computed output magnitude. This visual encoding made it easier for the user to distinguish active, transmitted, coupled, and isolated signal paths during interaction.
+To address potential visual limitations at extreme parameter values, explanatory notes were added to the wave animation panels. A note stating "Waves may not be visible at very high frequencies" was included in all four modules to inform users that wave rendering may become less clear when the operating frequency is very high and the corresponding wavelength becomes very short. This note helps set appropriate expectations for the graphical display behavior.
+Overall, the adopted graphical rendering method forms an important part of the developed application. It links the analytical backend to an interactive visual frontend and allows microwave component behavior to be presented in a way that is both computationally meaningful and educationally intuitive.
+
+5.5 Implementation of Individual Modules
+
+5.5.1 Resistive Divider Module
+
+The resistive power divider module implements a three-port network with equal power division and inherent isolation loss. The implementation consists of several key components organized in the lib/resistive_divider/ directory.
+The parameter input interface (rd_input.dart) provides controls for adjusting the operating frequency and characteristic impedance Z?. The frequency range spans from 0.1 GHz to 30 GHz, accommodating both microwave and millimeter-wave applications. Users can also select which port receives the input signal, with the system automatically calculating the resulting power distribution and reflection characteristics.
+The calculation steps component (rd_steps.dart) presents the mathematical derivation in four distinct stages. Step 1 establishes the circuit topology and resistance values based on the impedance matching requirements. Step 2 derives the scattering matrix elements using transmission line theory and power conservation principles. Step 3 demonstrates the substitution of the operating frequency into the S-parameter expressions, showing the intermediate complex values before conversion. For example, the calculation explicitly shows:S?? = 20×log??(0.3333) = -9.54 dB
+This two-stage presentation format—first showing the complex S-parameter values, then demonstrating the logarithmic conversion to decibel form—helps users understand the complete transformation from theoretical expressions to practical measurement units. Step 4 extends the analysis across the frequency range, with results displayed in the S-parameter plot positioned directly below the input controls.
+The frequency-dependent S-parameter plot uses a custom painter to render multiple curves simultaneously. When S?? and S?? have identical values due to circuit symmetry, the overlapping curves appear as a single line. A note adjacent to the plot clarifies this visual behavior: "Note: When curves overlap, only one line may be visible."
+The graphical visualization component (rd_painter.dart) renders an animated representation of the three-port network. Red waves indicate the excited input port, while blue waves show the output signals at the remaining ports. The wave amplitude corresponds to the calculated S-parameter magnitudes, providing immediate visual feedback about power distribution. At frequencies approaching 30 GHz, the wavelength becomes very short, and the sinusoidal pattern may not be clearly visible within the available rendering space. A note informs users: "Note: Waves may not be visible at very high frequencies."
+5.5.2 Wilkinson Divider Module
+
+The Wilkinson divider module implements a three-port network with improved isolation compared to the resistive divider, achieved through quarter-wave transmission line sections and an isolation resistor. The module structure mirrors the resistive divider's organization but incorporates more complex S-parameter expressions.
+The input interface (wd_input.dart) provides the same frequency and impedance controls as the resistive divider, maintaining consistency across modules. The port selection mechanism allows users to observe how the circuit responds when different ports are excited.
+The calculation steps (wd_steps.dart) follow the same four-step structure established in the resistive divider module. However, the S-parameter expressions in Step 2 are more complex, involving frequency-dependent phase terms due to the quarter-wave transformer sections. Step 3 shows the numerical evaluation at the selected frequency, explicitly displaying both the complex S-parameter values and their conversion to decibel form using the 20×log?? transformation.
+A significant improvement in this module's implementation was relocating the S-parameter plot from within Step 4 to a position directly below the input controls. This change, implemented in wd_main.dart, ensures visual consistency with the other three modules. The plot component (wd_plot.dart) uses the same rendering approach as the resistive divider, with frequency on the horizontal axis and S-parameter magnitude in dB on the vertical axis. The same note about overlapping curves appears adjacent to the plot.
+The animated visualization (wd_painter.dart) renders the three-port network with quarter-wave transmission line sections explicitly shown. The wave animation accounts for the phase shifts introduced by these transmission line sections, providing a more accurate representation of the signal propagation compared to the resistive divider's simpler topology.
+
+Figure 5.1 Wilkinson Divider implementation example
+
+5.5.3 Rat-Race Coupler Module
+
+The rat-race coupler module implements a four-port network with a ring topology, providing power division with specific phase relationships between output ports. This module required particular attention to the user interface design due to the increased number of ports.
+The input interface (coupler_input.dart) initially presented all four ports in a simple list format. Based on instructor feedback, the interface was redesigned to use a more intuitive button-based selection mechanism. Four clearly labeled buttons—"Port 1", "Port 2", "Port 3", and "Port 4"—allow users to select the excited port, with the active selection highlighted in red. This visual feedback immediately clarifies which port is receiving the input signal.
+The calculation steps (coupler_step.dart) maintain the four-step structure but accommodate the increased complexity of a four-port network. The S-parameter matrix is now 4×4, requiring sixteen individual elements. Step 3 shows the numerical evaluation for all sixteen parameters, with each conversion from complex magnitude to decibel form explicitly displayed. The note about overlapping curves is particularly relevant here, as the circuit's symmetry often results in multiple S-parameters having identical values.
+The S-parameter plot appears below the input controls, consistent with the other modules. The plot displays all relevant S-parameters across the frequency range, with different colors distinguishing the various curves.
+The visualization component (coupler_source.dart) renders the ring topology with four ports positioned at 90-degree intervals. During development, a bug was discovered where output waves would disappear at frequencies around 30 GHz. Investigation revealed that the wave amplitude calculation was producing values below the rendering threshold. The fix involved adjusting the amplitude scaling and adding a minimum threshold:
+final y = 10.0 * max(mag, 0.1) * sin((t / wavelength) * 2 * pi + phase);
+This ensures that even small-magnitude signals remain visible, though the high-frequency wave visibility note still applies when the wavelength becomes extremely short.
+
+
+Figure 5.2 User-defined excitation interface of the Rat-Race Coupler module
+
+By changing the selected ports, amplitudes, and phases, the user can observe how the output response varies according to the superposition properties of the hybrid ring. This functionality makes the module especially valuable from an educational point of view, since it allows multi-port behavior to be explored more intuitively than through formulas alone.
+5.5.4 Branch-Line Hybrid Module
+
+The branch-line hybrid module implements a four-port network with quadrature (90-degree) phase difference between output ports, commonly used in balanced amplifiers and mixers. The implementation follows the same architectural pattern as the rat-race coupler but with different S-parameter expressions reflecting the branch-line topology.
+The input interface (bl_input.dart) uses the same four-button port selection design as the rat-race coupler, providing consistent user experience across the four-port modules. The frequency and impedance controls maintain the same ranges and behavior as the other modules.
+The calculation steps (bl_steps.dart) present the branch-line hybrid's S-parameter derivation in four stages. The S-parameter expressions differ from the rat-race coupler due to the different transmission line lengths and connection topology, but the presentation format remains consistent. Step 3 shows the complete two-stage calculation: first the complex S-parameter values at the selected frequency, then the conversion to decibel form with the 20×log?? operation explicitly shown for each parameter.
+The S-parameter plot (bl_plot.dart) appears below the input controls and includes the note about overlapping curves. The plot rendering uses the same custom painter approach as the other modules, ensuring visual consistency throughout the application.
+The visualization component (bl_painter.dart) renders the branch-line topology with four ports and the characteristic quarter-wave branch sections. The wave animation accounts for the 90-degree phase relationships between ports, providing visual confirmation of the quadrature operation. The high-frequency wave visibility note appears in the same location as in the other modules.
+All four modules share common design patterns: consistent input interfaces, four-step calculation presentations with explicit dB conversion steps, S-parameter plots positioned below input controls, and animated visualizations with appropriate notes about visual limitations. This modular consistency facilitates user learning and reduces cognitive load when switching between different circuit types.
+
+5.6 Validation Approach
+
+The validation approach adopted in this study was based on analytical consistency rather than on hardware fabrication or full-wave electromagnetic simulation. This approach is appropriate because the developed application is intended primarily as a theory-driven educational tool, and its outputs are derived from ideal microwave network relationships.
+In practical terms, validation was performed by comparing the implemented software outputs with expected theoretical behavior under selected representative conditions. Particular emphasis was placed on the modules with meaningful variable inputs, since these provide the clearest basis for checking whether the implemented analytical logic responds correctly to user-defined conditions.
+For this reason, detailed case-based validation was focused mainly on the Wilkinson Divider and Rat-Race Coupler modules. The Resistive Divider and Branch-Line Hybrid modules were reviewed primarily in terms of logical consistency and functional realization, since their current implementations are closer to fixed or standard analytical demonstrations than to generalized parametric design tools.
+This form of validation should therefore be understood as software-level verification within the scope of ideal analytical microwave models. It does not represent fabricated hardware testing, nor does it attempt to replace professional full-wave simulation. Nevertheless, it is appropriate and sufficient for the educational and analytical
+
+objectives of the present project.
+
+5.7 Validation of Analytical Results
+
+The validation of the developed application was focused on the modules whose outputs vary meaningfully with user-defined analytical inputs. In the present implementation, detailed case-based validation was therefore carried out mainly for the Wilkinson Divider and Rat-Race Coupler modules. These two modules provide the most suitable basis for verification because their responses depend directly on adjustable design or excitation conditions.
+By contrast, the Resistive Divider and Branch-Line Hybrid modules were implemented primarily as fixed or idealized reference demonstrations within the application. The Resistive Divider module presents a predetermined ideal resistive split behavior, while the Branch-Line Hybrid module was implemented mainly to illustrate the standard single-input quadrature response. For this reason, these two modules were reviewed mainly in terms of logical consistency and interface realization, whereas the detailed analytical validation was concentrated on the more variable modules.
+5.7.1 Validation of the Wilkinson Divider Module
+
+The Wilkinson Divider module was validated using a representative unequal-split case, since the split ratio is the main adjustable parameter in the present implementation. In the selected test condition, the operating frequency was set to 3 GHz and the split ratio was set to 2.0 dB. Under this condition, the theoretical expectation is that the two
+
+output ports should no longer exhibit equal transmission, but should instead differ by approximately 2.0 dB, while the network should still retain ideal matching and output isolation within the adopted analytical model.
+As shown in Figure 5.1, the application produced the following results: ??21 =
+
+?4.1 dB , ??31 = ?2.1 dB , ??11 = ?60 dB , and ??23 = ?60 dB . The difference between ??21 and ??31 is therefore 2.0 dB, which agrees exactly with the selected split ratio. In addition, the very low values of ??11 and ??23 indicate near-ideal matching and isolation in the implemented analytical model.
+A further consistency check can be made by examining the transmitted power levels. Converting the two transmission coefficients from decibel form to linear power gives 10?4.1/10 + 10?2.1/10 ≈ 1.00,
+which shows that the total transmitted power remains consistent with ideal lossless division in the model. This result confirms that the Wilkinson Divider module responds correctly to the user-defined split ratio and reproduces the expected unequal power
+division behavior.
+
+
+
+Quantity
+
+Expected ResultApp
+
+Result
+
+ConclusionOutput	split
+
+difference
+
+2.0 dB
+
+2.0 dB
+
+Consistent
+??21Lower of the two outputs?4.1 dBConsistent
+
+
+Quantity
+
+Expected ResultApp
+
+Result
+
+Conclusion
+??31Higher of the two outputs?2.1 dBConsistent
+
+??11Near-zero reflection in the
+
+ideal model
+
+?60 dB
+
+Consistent
+
+??23Near-zero coupling between
+
+outputs
+
+?60 dB
+
+ConsistentTable 5-1 Validation of the Wilkinson Divider module
+
+5.7.2 Validation of the Rat-Race Coupler Module
+
+The Rat-Race Coupler module was validated using a generalized multi-input excitation case rather than a simple single-port excitation. This choice is more appropriate for the present application because the developed module allows arbitrary combinations of input amplitude and phase at different ports. Therefore, validation using a non-trivial excitation condition provides a stronger demonstration of the correctness of the implemented scattering-matrix computation.
+
+
+　Figure 5.3 Output response of the Rat-Race Coupler under single-port excitation In the selected case, Port 1 and Port 3 were excited simultaneously, while Port 2 and Port 4 were set to zero. The input amplitudes and phases were defined as follows:
+??1 = 1.900∠12?, ??2 = 0, ??3 = 3.500∠121?, ??4 = 0.
+
+The implemented module uses the ideal rat-race scattering matrix
+
+
+
+???
+[??] =
+
+0	1	1	0
+1	0	0	?1
+
+[	],
+√2 1	0	0	1
+0	?1	1	0
+and the outgoing wave vector is obtained from
+
+?? = ????.
+
+Substituting the selected excitation vector into the above relation gives
+1.900∠12?
+?? = [	0	],
+3.500∠121?
+0
+from which the expected outputs are
+
+??1
+
+???
+=  ??3
+√2
+
+= 2.4749∠31?,
+
+??2
+
+??3
+
+??4
+
+???
+=  ??1
+√2
+???
+=  ??1
+√2
+???
+=  ??
+√2
+
+= 1.3435∠ ? 78?,
+
+= 1.3435∠ ? 78?,
+
+3 = 2.4749∠31?.
+
+
+These theoretical results are in full agreement with the outputs displayed by the application.  The  app  reported  ∣ ??1 ∣= 2.4749 ,  ∠??1 = 31.0? ,  ∣ ??2 ∣= 1.3435 ,  ∠??2 = ?78.0? ,  ∣ ??3 ∣= 1.3435 ,  ∠??3 = ?78.0? , and  ∣ ??4 ∣= 2.4749, ∠??4 = 31.0? . The result therefore confirms that the implemented module correctly performs the wave transformation for arbitrary multi-port excitation conditions.
+Power consistency was also verified. For normalized wave amplitudes, the total input power is
+??in =∣ ??1 ∣2 +∣ ??3 ∣2= 1.9002 + 3.5002 = 15.860,
+
+while the total output power is
+
+??out =∣ ??1 ∣2 +∣ ??2 ∣2 +∣ ??3 ∣2 +∣ ??4 ∣2= 6.125 + 1.805 + 1.805 + 6.125
+
+= 15.860.
+
+Thus,
+
+??in = ??out,
+
+which confirms power conservation in the implemented ideal lossless model.
+
+This validation case is particularly significant because it demonstrates that the Rat- Race Coupler module is not limited to predefined textbook excitations such as equal-
+
+phase or opposite-phase input pairs. Instead, it can correctly process generalized user- defined amplitude-phase combinations, which represents one of the main analytical
+strengths of the developed application.
+
+
+
+QuantityTheoretical
+
+Result
+
+App Result
+
+Conclusion
+
+??1
+
+1.900∠12?
+
+1.900∠12?Input	applied
+
+correctly
+
+??3
+
+3.500∠121?
+
+3.500∠121?Input	applied
+
+correctly??12.4749∠31?2.4749∠31.0?Consistent
+
+??2
+
+1.3435∠ ? 78?1.3435∠
+
+? 78.0?
+
+Consistent
+
+??3
+
+1.3435∠ ? 78?1.3435∠
+
+? 78.0?
+
+Consistent??42.4749∠31?2.4749∠31.0?ConsistentTotal	input
+
+power
+
+15.860
+
+15.860
+
+ConsistentTotal	output
+
+power
+
+15.860
+
+15.860
+
+Consistent
+Table 5-2 Validation of the Rat-Race Coupler module
+
+5.7.3 Remarks on the Resistive Divider and Branch-Line Hybrid Modules
+In the present version of the application, the Resistive Divider module was implemented mainly as a fixed analytical reference. Its displayed response corresponds to the standard ideal behavior of a resistive power divider, in which the signal is divided equally between the two output ports while part of the power is dissipated in the resistor network. Since the module does not currently provide a meaningful variable design space beyond nominal frequency entry, a separate case-based validation was not emphasized. Instead, the module was checked for consistency with the expected textbook behavior of a lossy divider and was retained primarily as a comparative baseline against the Wilkinson Divider.
+Similarly, the Branch-Line Hybrid module was implemented as a standard idealized demonstration of quadrature coupling under the conventional single-input condition. The main purpose of this module is to illustrate equal output division, isolated-port behavior, and the characteristic 90? phase difference at the design frequency. Because the current implementation is not intended as a generalized multi-excitation or broadband analysis tool, a separate numerical validation case was not treated as a central part of the present evaluation. Its role in the application is therefore primarily demonstrative and educational rather than parametric.
+Overall, the selected validation results confirm that the analytically variable parts of the application, especially the Wilkinson Divider and Rat-Race Coupler modules,
+
+operate in accordance with theoretical expectations. This supports the conclusion that the developed system performs correctly within the scope of the adopted ideal microwave models.
+5.8 Functional Testing of the Application
+
+In addition to the analytical validation presented in Section 5.6, basic functional testing was carried out to evaluate the operational reliability of the developed application. Since the system was designed as an interactive analytical tool, correct numerical behavior alone was not sufficient; it was also necessary to confirm that the interface, parameter handling, and result presentation operated in a stable and understandable manner.
+The first aspect of functional testing concerned navigation and page-level consistency. Each module page was accessed repeatedly from the main interface to confirm that the transition between pages remained stable and that the overall user interaction pattern was consistent across the application. This was particularly important because the project integrates several different microwave components within a single software framework.
+The second aspect concerned parameter input and result updating. For the Wilkinson Divider module, the split-ratio control was checked to confirm that changes in the selected value were reflected correctly in the displayed transmission results. For the Rat-Race Coupler module, the excitation settings, including amplitude and phase selection, were checked to ensure that the output response updated correctly according
+
+to the selected input vector. These checks were important because both modules depend directly on variable user-defined conditions.
+The Resistive Divider and Branch-Line Hybrid modules were also reviewed functionally, although they were not the main focus of detailed numerical validation. In the Resistive Divider module, the displayed fixed analytical response was checked for consistency and correct presentation. In the Branch-Line Hybrid module, the standard single-input output display was reviewed to ensure that the expected quadrature response could be presented clearly and stably within the application interface.
+Overall, the functional testing indicated that the application operates reliably within the intended project scope. The implemented pages remained stable during repeated use, the interactive controls responded correctly, and the output displays remained consistent with the analytical purpose of the system. These observations support the suitability of the developed software as an educational and theory-based microwave
+analysis tool.
+
+
+Module
+Functional item checked
+OutcomeResistive DividerFixed response display and page stabilityPassedWilkinson Divider
+
+Split-ratio adjustment and result update
+
+PassedRat-RaceAmplitude/phase excitation handling andPassed
+
+Module
+Functional item checked
+OutcomeCoupleroutput updateBranch-Line HybridStandard	output	display	and	interface consistency
+
+PassedTable 5-2 Functional testing summary
+
+5.9 Discussion
+
+The developed application demonstrates that microwave passive component theory can be translated into a practical and interactive analytical tool using a lightweight cross-platform software framework. One of the main contributions of the system lies in its integration of multiple representative microwave components within a single environment. This allows users to compare different forms of power division and coupling behavior without relying solely on static textbook equations or multiple separate tools.
+A particular strength of the application is its educational orientation. Because the software is based on direct analytical relationships, users can observe the connection between selected input conditions and resulting microwave behavior immediately. This is especially evident in the Wilkinson Divider and Rat-Race Coupler modules, where changes in split ratio or excitation state produce clear and interpretable differences in the displayed outputs. Such interactivity improves conceptual understanding and supports the pedagogical motivation of the project.
+
+At the same time, the current implementation has several limitations. The analytical models are based on idealized circuit theory and therefore do not include conductor loss, dielectric loss, fabrication tolerance, discontinuity effects, bandwidth limitations, or full electromagnetic field behavior. For this reason, the application should not be interpreted as a replacement for professional simulation environments such as ADS, CST, or HFSS. Instead, it should be regarded as an educational and preliminary analytical platform.
+Another limitation is that the present validation is based on selected theoretical software-level checks rather than on fabricated hardware measurement or extensive external benchmarking. This is consistent with the scope of the project, but it also means that the current evaluation is focused on correctness within ideal analytical conditions rather than real-world implementation performance. Future work could therefore extend the application by incorporating broader validation, comparison with external simulation tools, or user-based evaluation.
+Despite these limitations, the developed system successfully achieves its main objective. It provides an accessible and structured environment for studying the behavior of representative microwave passive components and demonstrates the potential of Flutter-based engineering software in educational contexts.
+5.10 Chapter Summary
+
+This chapter has presented the implementation and evaluation of the developed application. It described the overall system realization, user interface design, and the
+
+implementation of the four microwave component modules. It also introduced the graphical rendering and visualization methods used to generate the interactive schematics within Flutter, including dynamic wave display and programmatic component drawing. Validation and functional testing further showed that the implemented analytical models and interface behaviors were consistent with the intended theoretical design. Overall, the results indicate that the developed system successfully combines microwave theory, software implementation, and interactive visualization in a unified educational application.
+
+Chapter 6
+Conclusions and Future Work
+
+6.1 Introduction
+
+This chapter concludes the dissertation by summarizing the main outcomes of the project, evaluating the extent to which the research objectives were achieved, and discussing possible directions for future improvement.
+6.2 Summary of the Project
+
+This dissertation presented the design and development of a cross-platform analytical application for selected microwave passive components. The work focused on four representative structures: the Resistive Divider, Wilkinson Divider, Rat-Race Coupler, and Branch-Line Hybrid. The main purpose of the project was to transform theoretical microwave network analysis into a software-based learning tool that allows users to explore component behavior through parameter input and immediate analytical output. The project began with a review of the theoretical background of microwave passive components and their role in RF and microwave systems. Based on this foundation, analytical models were selected and implemented in software form. A modular application architecture was then developed using Flutter and Dart, allowing different microwave components to be integrated into a unified interface with consistent interaction logic.
+
+The completed application shows that microwave theory can be presented in a lightweight and accessible software environment. The system supports parameter input, analytical computation, and result presentation in a form suitable for educational use and preliminary theoretical study.
+6.3 Achievement of Objectives
+
+The objectives defined for this project were achieved to a satisfactory extent.
+
+First, the project aimed to develop a usable software platform for the analysis of microwave passive components. This was fulfilled through the implementation of a Flutter-based application containing multiple component modules within a common framework.
+Second, the project aimed to present the analytical behavior of selected microwave structures in a clear and interactive form. This was also achieved. The Wilkinson Divider module supports variable split-ratio analysis, while the Rat-Race Coupler module supports amplitude-phase excitation and matrix-based output calculation. In addition, the Resistive Divider and Branch-Line Hybrid modules provide standard demonstrations of typical microwave behavior.
+Third, the project aimed to verify that the implemented analytical outputs were consistent with theoretical expectations. Within the scope of ideal analytical models, this objective was addressed through module-level validation and functional testing. In particular, the Wilkinson Divider and Rat-Race Coupler modules showed good agreement with expected theoretical behavior.
+
+Overall, the project met its main academic and technical objectives and produced a working application aligned with the original aims of the dissertation.
+6.4 Main Contributions of the Study
+
+The main contribution of this study is the development of an analytical application that connects microwave theory with cross-platform software implementation. Instead of treating microwave component analysis only as a set of static formulas, the project shows how these principles can be presented in a form that supports user interaction and result visualization.
+A further contribution is the integration of multiple microwave passive component types within a single modular system. This allows users to compare different divider and coupler structures in one environment, which improves both convenience and conceptual understanding.
+The project also shows that Flutter can be used effectively for engineering-oriented educational software. This suggests that modern cross-platform frameworks have useful potential in technical teaching and theory-based analytical applications.
+6.5 Limitations of the Present Work
+
+Despite the successful completion of the project, several limitations should be acknowledged.
+First, the analytical models used in the application are idealized. They do not include practical non-ideal effects such as conductor loss, dielectric loss, fabrication tolerance,
+
+discontinuities, or full-wave electromagnetic behavior. As a result, the developed application should be regarded as an analytical and educational tool rather than a replacement for professional microwave design software.
+Second, the validation in this study was limited to theoretical consistency and software-level checking. The project did not include fabricated hardware measurement or comparison with commercial full-wave simulation platforms. Although this is acceptable within the scope of the dissertation, it limits direct extension to practical engineering implementation.
+Third, some modules currently provide more analytical flexibility than others. In particular, the Wilkinson Divider and Rat-Race Coupler modules support more user- defined variation, whereas the Resistive Divider and Branch-Line Hybrid modules are implemented mainly as standard reference cases.
+6.6 Future Work
+
+There are several possible directions for future development.
+
+One possible extension is to incorporate more advanced microwave components or additional design options, such as broader unequal-split configurations, frequency- dependent response analysis, or extra multi-port excitation cases. This would increase the analytical richness of the application.
+Another important direction is to compare the software outputs with results from established simulation tools such as ADS, CST, or HFSS. Such comparison would strengthen the validation of the application and provide a clearer link between
+
+analytical theory and practical design workflows.
+
+Future work could also include a more comprehensive user evaluation, especially in an educational setting. Feedback from students or instructors could be used to improve the interface, refine the presentation of results, and assess the application’s effectiveness as a learning aid.
+Finally, the software could be expanded through improved visualization, interactive plots, export functions, or web deployment. These additions would make the application more useful as a general engineering education platform.
+6.7 Final Conclusion
+
+In conclusion, this dissertation presented the development of a Flutter-based analytical application for microwave passive components. The system combines theoretical microwave analysis with interactive software implementation and provides a structured environment for studying several representative passive devices. Within the scope of ideal analytical models, the application performs reliably and produces outputs consistent with theoretical expectations.
+Although the system does not replace full-wave simulation or experimental measurement, it fulfills its intended role as an accessible tool for learning and preliminary analysis. The project also shows that cross-platform software frameworks can be applied effectively in microwave engineering education. In this sense, the work provides a useful basis for future extension and improvement.
+
+References
+[1] D. M. Pozar, Microwave Engineering, 4th ed. Hoboken, NJ, USA: Wiley, 2011.
+[2] K. C. Gupta, “Concept maps and modules for microwave education,” IEEE
+Microwave Magazine, vol. 3, no. 1, pp. 56–63, Mar. 2002.
+[2] K. C. Gupta, “Concept maps and modules for microwave education,” IEEE
+Microwave Magazine, vol. 3, no. 1, pp. 56–63, Mar. 2002.
+[3] B. Pejcinovic, “Application of active learning in microwave circuit design courses,” in Proc. ASEE Annu. Conf. Expo., 2013.
+[4] R. J. Weber, Introduction to Microwave Circuits: Radio Frequency and Design Applications. Hoboken, NJ, USA: Wiley, 2001.
+[5] F. Lin, W. Feng, and X. Tan, “Tunable balanced power dividers,” IEEE
+Microwave Magazine, vol. 22, no. 3, pp. 56–68, Mar. 2021.
+[6] S. H. Shehab and N. C. Karmakar, “Substrate-integrated-waveguide power dividers: Overview and recent advances,” IEEE Antennas and Propagation Magazine, vol. 61, no. 1, pp. 62–74, Feb. 2019.
+[7] Z. Kordiboroujeni and J. Bornemann, “Efficient design of substrate integrated waveguide power dividers for antenna feed systems,” in Proc. IEEE Antennas Propag. Soc. Int. Symp., 2013.
+[8] I. Slomian, P. Fusco, J. C. Batchelor, and R. Cahill, “Microstrip antenna array with series feeding network,” IEEE Antennas and Wireless Propagation Letters, vol. 11, pp. 1464–1467, 2012.
+[9] D. M. Pozar, “A modern course in microwave engineering,” IEEE Transactions
+on Education, vol. 45, no. 2, pp. 112–117, May 2002.
+[10] M. A. Jensen and D. V. Arnold, “System-level microwave design: Radar-based laboratory projects,” IEEE Transactions on Education, vol. 45, no. 4, pp. 347– 353, Nov. 2002.
+[11] A. O. Nwajana and E. R. Obi, “A review on SIW and its applications to microwave components,” Electronics, vol. 11, no. 21, Art. no. 3476, 2022.
+[12] E. J. Wilkinson, “An NNN-way hybrid power divider,” IRE Transactions on
+Microwave Theory and Techniques, vol. 8, no. 1, pp. 116–118, Jan. 1960.
+[13] T. Yamada and K. Tachibana, “Design method for wideband resistive voltage
+
+divider,” IEEE Transactions on Microwave Theory and Techniques, vol. 68,
+no. 9, pp. 3652–3660, Sep. 2020.
+[14] Y.-S. Chen and C.-W. Chiu, “Insertion loss characterization of impedance matching networks,” IEEE Transactions on Components, Packaging and Manufacturing Technology, vol. 8, no. 6, pp. 1024–1031, Jun. 2018.
+[15] Z.-X. Du, X.-Y. Zhang, and Q. Xue, “Unequal Wilkinson power divider with reduced arm length,” IEEE Transactions on Microwave Theory and Techniques, vol. 64, no. 1, pp. 256–264, Jan. 2016.
+[16] Y. Wu, Y. Liu, and S. Li, “Unequal dual-frequency Wilkinson power divider,”
+IET Microwaves, Antennas & Propagation, vol. 3, no. 7, pp. 1070–1075, 2009.
+[17] J.-C. Kao, M.-J. Wu, and C.-H. Wang, “A modified Wilkinson power divider with isolation bandwidth improvement,” IEEE Transactions on Microwave Theory and Techniques, vol. 60, no. 9, pp. 2761–2767, Sep. 2012.
+[18] P.-H. Deng and L.-C. Dai, “Unequal Wilkinson power dividers with favorable selectivity and high isolation,” IEEE Transactions on Microwave Theory and Techniques, vol. 60, no. 6, pp. 1520–1528, Jun. 2012.
+[19] C. Y. Pon, “Hybrid-ring directional coupler for arbitrary power divisions,” IRE Transactions on Microwave Theory and Techniques, vol. 9, no. 6, pp. 529–535, Nov. 1961.
+[20] H. Zhang and K. J. Chen, “Design of dual-band rat-race couplers,” IET
+Microwaves, Antennas & Propagation, vol. 3, no. 3, pp. 412–418, 2009.
+[21] S. Rodríguez, J. L. González, and R. N. Simons, “Characterization of branch- line and rat-race ideal hybrids,” in Proc. IEEE MTT-S Int. Microw. Symp., 2011.
+[22] W. Feng, W. Che, Q. Xue, and S. K. Koul, “Balanced rat-race couplers with wideband common-mode suppression,” IEEE Transactions on Microwave Theory and Techniques, vol. 67, no. 6, pp. 2261–2272, Jun. 2019.
+[23] J. C. Tippet and R. A. Speciale, “A rigorous technique for measuring the scattering matrix of a multiport device with a 2-port network analyzer,” IEEE Transactions on Microwave Theory and Techniques, vol. 30, no. 5, pp. 661– 666, May 1982.
+[24] R. Mavaddat, Network Scattering Parameters. Singapore: World Scientific, 1996.
+
+[25] V. K. Tripathi and H. B. Lunden, “Analysis and design of branch-line hybrids with coupled lines,” IEEE Transactions on Microwave Theory and Techniques, vol. 32, no. 10, pp. 1059–1064, Oct. 1984.
+[26] L. Chiu and Q. Xue, “Investigation of wideband 90-degree hybrid coupler with good amplitude and phase balance,” IEEE Transactions on Microwave Theory and Techniques, vol. 58, no. 4, pp. 1022–1029, Apr. 2010.
+[27] A. M. Abbosh, “Planar out-of-phase power divider/combiner for wideband high-power microwave applications,” IEEE Transactions on Components, Packaging and Manufacturing Technology, vol. 3, no. 3, pp. 484–490, Mar. 2013.
+[28] J. A. Dobrowolski, Scattering Parameters in RF and Microwave Circuit Analysis and Design. Norwood, MA, USA: Artech House, 2016.
+[29] J. Dobrowolski, Microwave Network Design Using the Scattering Matrix. Norwood, MA, USA: Artech House, 2010.
+[30] A. Al-Zoubi, “Student active learning tool for microwave engineering education,” International Journal of Engineering Pedagogy, vol. 9, no. 3, pp. 45–56, 2019.
+[31] B. Pejcinovic and R. L. Campbell, “Active learning and hardware projects in microwave/RF education,” in Proc. Eur. Radar Conf., 2013.
+[32] Wagih M, Ghannam R. A Framework for Enhancing RF and Microwave Engineering Education with Low-Cost Tools for Active, Project-Based Learning[J]. Authorea Preprints, 2025.
+[33] G. O. Migowski and J. C. A. Santos, “Designing an RF front-end radio receiver
+for educational purposes,” in Proc. IEEE MTT-S Int. Microw. Symp., 2003.
+[34] S. A. Kinari, A. A. N. Perwira, and K. Kusrini, “An independent learning system for Flutter cross-platform mobile programming,” Information, vol. 15, no. 2, 2024.
+[35] S. T. Aung, T. T. Soe, and K. M. Oo, “A study of learning environment for initiating Flutter app development using Docker,” Information, vol. 15, no. 1, 2024.
+[36] Y. W. Syaifudin, A. Rakhmatsyah, and D. Aprilia, “Implementation of self- learning topic for Flutter programming learning assistance system,” in Proc. Int. Conf. Inf. Technol. Syst. Innov., 2024.
+
+[37] S. Khan, M. A. Rahman, and N. Islam, “E-education application using Flutter: Concepts and methods,” in Proc. Int. Conf. Comput. Commun. Informatics, 2023.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
