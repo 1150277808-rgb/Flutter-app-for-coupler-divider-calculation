@@ -175,17 +175,19 @@ class ResistiveDividerSteps extends StatelessWidget {
                   style: TextStyle(fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 8),
-                Text(
-                  "S₁₁ = 20×log₁₀(${mag11.toStringAsFixed(4)}) = ${(mag11 <= 0.0001 ? -100.0 : 20 * (log(mag11) / ln10)).toStringAsFixed(2)} dB",
-                  style: const TextStyle(fontSize: 12),
+                Math.tex(
+                  'S_{11} = 20 \\times \\log_{10}(${mag11.toStringAsFixed(4)}) = ${(mag11 <= 0.0001 ? -100.0 : 20 * (log(mag11) / ln10)).toStringAsFixed(2)}\\,\\text{dB}',
+                  textStyle: const TextStyle(fontSize: 12),
                 ),
-                Text(
-                  "S₂₁ = 20×log₁₀(${mag21.toStringAsFixed(4)}) = ${(mag21 <= 0.0001 ? -100.0 : 20 * (log(mag21) / ln10)).toStringAsFixed(2)} dB",
-                  style: const TextStyle(fontSize: 12),
+                const SizedBox(height: 4),
+                Math.tex(
+                  'S_{21} = 20 \\times \\log_{10}(${mag21.toStringAsFixed(4)}) = ${(mag21 <= 0.0001 ? -100.0 : 20 * (log(mag21) / ln10)).toStringAsFixed(2)}\\,\\text{dB}',
+                  textStyle: const TextStyle(fontSize: 12),
                 ),
-                Text(
-                  "S₃₁ = 20×log₁₀(${mag31.toStringAsFixed(4)}) = ${(mag31 <= 0.0001 ? -100.0 : 20 * (log(mag31) / ln10)).toStringAsFixed(2)} dB",
-                  style: const TextStyle(fontSize: 12),
+                const SizedBox(height: 4),
+                Math.tex(
+                  'S_{31} = 20 \\times \\log_{10}(${mag31.toStringAsFixed(4)}) = ${(mag31 <= 0.0001 ? -100.0 : 20 * (log(mag31) / ln10)).toStringAsFixed(2)}\\,\\text{dB}',
+                  textStyle: const TextStyle(fontSize: 12),
                 ),
               ],
             ),

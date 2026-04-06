@@ -329,11 +329,10 @@ class PolarizationSteps extends StatelessWidget {
               ),
             ),
           ),
-          Text(
-            "|b$port| = ${mag.toStringAsFixed(4)},  ∠b$port = ${phase.toStringAsFixed(1)}°,  P = ${power.toStringAsFixed(4)}",
-            style: TextStyle(
-              fontFamily: "monospace",
-              fontSize: 14,
+          Math.tex(
+            '|b_$port| = ${mag.toStringAsFixed(4)},\\;\\angle b_$port = ${phase.toStringAsFixed(1)}^\\circ,\\;P = ${power.toStringAsFixed(4)}',
+            textStyle: TextStyle(
+              fontSize: 13,
               fontWeight: FontWeight.bold,
               color: nearZero ? Colors.grey : Colors.black,
             ),
@@ -413,10 +412,13 @@ class PolarizationSteps extends StatelessWidget {
         children: [
           Text("Frequency: ${oldFreq.toStringAsFixed(2)} GHz", style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600)),
           const SizedBox(height: 8),
-          Text("S₁₁ = ${s11Mag.toStringAsFixed(4)} ∠ ${s11Phase.toStringAsFixed(1)}° = ${s11dB.toStringAsFixed(2)} dB", style: const TextStyle(fontSize: 11)),
-          Text("S₂₁ = ${s21Mag.toStringAsFixed(4)} ∠ ${s21Phase.toStringAsFixed(1)}° = ${s21dB.toStringAsFixed(2)} dB", style: const TextStyle(fontSize: 11)),
-          Text("S₃₁ = ${s31Mag.toStringAsFixed(4)} ∠ ${s31Phase.toStringAsFixed(1)}° = ${s31dB.toStringAsFixed(2)} dB", style: const TextStyle(fontSize: 11)),
-          Text("S₄₁ = ${s41Mag.toStringAsFixed(4)} ∠ ${s41Phase.toStringAsFixed(1)}° = ${s41dB.toStringAsFixed(2)} dB", style: const TextStyle(fontSize: 11)),
+          Math.tex('S_{11} = ${s11Mag.toStringAsFixed(4)} \\angle ${s11Phase.toStringAsFixed(1)}^\\circ = ${s11dB.toStringAsFixed(2)}\\,\\text{dB}', textStyle: const TextStyle(fontSize: 12)),
+          const SizedBox(height: 4),
+          Math.tex('S_{21} = ${s21Mag.toStringAsFixed(4)} \\angle ${s21Phase.toStringAsFixed(1)}^\\circ = ${s21dB.toStringAsFixed(2)}\\,\\text{dB}', textStyle: const TextStyle(fontSize: 12)),
+          const SizedBox(height: 4),
+          Math.tex('S_{31} = ${s31Mag.toStringAsFixed(4)} \\angle ${s31Phase.toStringAsFixed(1)}^\\circ = ${s31dB.toStringAsFixed(2)}\\,\\text{dB}', textStyle: const TextStyle(fontSize: 12)),
+          const SizedBox(height: 4),
+          Math.tex('S_{41} = ${s41Mag.toStringAsFixed(4)} \\angle ${s41Phase.toStringAsFixed(1)}^\\circ = ${s41dB.toStringAsFixed(2)}\\,\\text{dB}', textStyle: const TextStyle(fontSize: 12)),
         ],
       ),
     );
