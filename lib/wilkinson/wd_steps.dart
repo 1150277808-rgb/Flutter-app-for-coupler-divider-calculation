@@ -13,6 +13,16 @@ class WilkinsonSteps extends StatelessWidget {
     return 20 * math.log(mag) / math.ln10;
   }
 
+  String _formatVal(double val) {
+    if (val.abs() < 0.001 && val.abs() > 1e-12) {
+      final exp = (math.log(val.abs()) / math.ln10).floor();
+      final mantissa = val.abs() / math.pow(10, exp);
+      return '${mantissa.toStringAsFixed(3)} \\times 10^{$exp}';
+    }
+    if (val.abs() <= 1e-12) return '0';
+    return val.toStringAsFixed(4);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -257,17 +267,23 @@ class WilkinsonSteps extends StatelessWidget {
                     children: [
                       const Text("Step 1: Substitute frequency into S-parameters to get complex values:", style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600)),
                       const SizedBox(height: 6),
-                      Text("S₁₁(f) = cos(θ) = cos(${sample.theta.toStringAsFixed(3)}) = ${sample.s11.toStringAsFixed(4)}", style: const TextStyle(fontSize: 11)),
-                      Text("S₂₁(f) = √(1/(1+K²)) × sin(θ) = √(1/${(1+controller.kSquared).toStringAsFixed(2)}) × sin(${sample.theta.toStringAsFixed(3)}) = ${sample.s21.toStringAsFixed(4)}", style: const TextStyle(fontSize: 11)),
-                      Text("S₃₁(f) = √(K²/(1+K²)) × sin(θ) = √(${controller.kSquared.toStringAsFixed(2)}/${(1+controller.kSquared).toStringAsFixed(2)}) × sin(${sample.theta.toStringAsFixed(3)}) = ${sample.s31.toStringAsFixed(4)}", style: const TextStyle(fontSize: 11)),
-                      Text("S₂₃(f) = cos(θ) = ${sample.s23.toStringAsFixed(4)}", style: const TextStyle(fontSize: 11)),
-                      const SizedBox(height: 8),
+                      Math.tex('S_{11}(f) = \\cos(\\theta) = \\cos(${sample.theta.toStringAsFixed(3)}) = ${_formatVal(sample.s11)}', textStyle: const TextStyle(fontSize: 12)),
+                      const SizedBox(height: 4),
+                      Math.tex('S_{21}(f) = \\sqrt{\\frac{1}{1+K^2}} \\sin(\\theta) = \\sqrt{\\frac{1}{${(1+controller.kSquared).toStringAsFixed(2)}}} \\times ${_formatVal(math.sin(sample.theta))} = ${_formatVal(sample.s21)}', textStyle: const TextStyle(fontSize: 12)),
+                      const SizedBox(height: 4),
+                      Math.tex('S_{31}(f) = \\sqrt{\\frac{K^2}{1+K^2}} \\sin(\\theta) = \\sqrt{\\frac{${controller.kSquared.toStringAsFixed(2)}}{${(1+controller.kSquared).toStringAsFixed(2)}}} \\times ${_formatVal(math.sin(sample.theta))} = ${_formatVal(sample.s31)}', textStyle: const TextStyle(fontSize: 12)),
+                      const SizedBox(height: 4),
+                      Math.tex('S_{23}(f) = \\cos(\\theta) = ${_formatVal(sample.s23)}', textStyle: const TextStyle(fontSize: 12)),
+                      const SizedBox(height: 10),
                       const Text("Step 2: Convert magnitude to dB using 20×log₁₀(|S|):", style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600)),
                       const SizedBox(height: 6),
-                      Text("S₁₁ = 20×log₁₀(${sample.s11.toStringAsFixed(4)}) = ${s11dB.toStringAsFixed(2)} dB", style: const TextStyle(fontSize: 11)),
-                      Text("S₂₁ = 20×log₁₀(${sample.s21.toStringAsFixed(4)}) = ${s21dB.toStringAsFixed(2)} dB", style: const TextStyle(fontSize: 11)),
-                      Text("S₃₁ = 20×log₁₀(${sample.s31.toStringAsFixed(4)}) = ${s31dB.toStringAsFixed(2)} dB", style: const TextStyle(fontSize: 11)),
-                      Text("S₂₃ = 20×log₁₀(${sample.s23.toStringAsFixed(4)}) = ${s23dB.toStringAsFixed(2)} dB", style: const TextStyle(fontSize: 11)),
+                      Math.tex('S_{11} = 20 \\times \\log_{10}(${_formatVal(sample.s11)}) = ${s11dB.toStringAsFixed(2)}\\,\\text{dB}', textStyle: const TextStyle(fontSize: 12)),
+                      const SizedBox(height: 4),
+                      Math.tex('S_{21} = 20 \\times \\log_{10}(${_formatVal(sample.s21)}) = ${s21dB.toStringAsFixed(2)}\\,\\text{dB}', textStyle: const TextStyle(fontSize: 12)),
+                      const SizedBox(height: 4),
+                      Math.tex('S_{31} = 20 \\times \\log_{10}(${_formatVal(sample.s31)}) = ${s31dB.toStringAsFixed(2)}\\,\\text{dB}', textStyle: const TextStyle(fontSize: 12)),
+                      const SizedBox(height: 4),
+                      Math.tex('S_{23} = 20 \\times \\log_{10}(${_formatVal(sample.s23)}) = ${s23dB.toStringAsFixed(2)}\\,\\text{dB}', textStyle: const TextStyle(fontSize: 12)),
                     ],
                   ),
                 ),
